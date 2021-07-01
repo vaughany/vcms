@@ -1,0 +1,39 @@
+{{ define "content" }}
+  <div class="container">
+
+    <h3 class="is-size-3">Nodes</h3>
+
+    {{ if .Rows }}
+    <table class="table is-striped is-hoverable is-fullwidth">
+      <thead>
+        <tr>
+          <th>#</th>
+          <!-- <th>User@Hostname</th> -->
+          <th>Hostname</th>
+          <th>IP Address</th>
+          <th>Username</th>
+          <th>First Seen</th>
+          <th>Last Seen</th>
+        </tr>
+      </thead>
+      <tbody>
+{{ range $index, $element := .Rows }}
+        <tr>
+          <th>{{ inc $index }}</th>
+          <!-- <td>{{ if .Username }}{{ .Username }}@{{ end }}{{ .Hostname }}</td> -->
+          <td>{{ .Hostname }}</td>
+          <td>{{ .IPAddress }}</td>
+          <td>{{ .Username }}</td>
+          <td>{{ .FirstSeen }}</td>
+          <td>{{ .LastSeen }}</td>
+        </tr>
+{{ end }}
+      </tbody>
+    </table>
+
+    {{ else }}
+      <p>Nothing yet, sorry.</p>
+    {{ end }}
+
+  </div>
+{{ end }}
