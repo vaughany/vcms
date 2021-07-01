@@ -1,5 +1,7 @@
 # VCMS - Vaughany's Computer Monitoring System
 
+![Screenshot of v0.0.1](./screenshots/v0.0.1.png)
+
 ## What is VCMS?
 
 > **tl;dr:**  VCMS is a work-in-progress cross-platform multi-computer health monitoring tool, and is a side-project I am working on to learn [Go](https://golang.org/).  Be kind!
