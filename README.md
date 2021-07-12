@@ -1,6 +1,6 @@
 # VCMS - Vaughany's Computer Monitoring System
 
-![Screenshot of v0.0.1](./screenshots/v0.0.1.png)
+![Screenshot of v0.0.2](./screenshots/v0.0.2.png)
 
 ## What is VCMS?
 
