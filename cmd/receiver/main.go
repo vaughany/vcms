@@ -44,18 +44,29 @@ type HTMLData struct {
 }
 
 type rowData struct {
-	Hostname  template.HTML
-	IPAddress template.HTML
-	Username  template.HTML
-	FirstSeen template.HTML
-	LastSeen  template.HTML
+	Hostname       template.HTML
+	Errors         template.HTML
+	IPAddress      template.HTML
+	Username       template.HTML
+	FirstSeen      template.HTML
+	LastSeen       template.HTML
+	HostUptime     template.HTML
+	OsVersion      template.HTML
+	RebootRequired template.HTML
+	LoadAvgs       template.HTML
+	MemoryTotal    template.HTML
+	MemoryFree     template.HTML
+	SwapTotal      template.HTML
+	SwapFree       template.HTML
+	DiskTotal      template.HTML
+	DiskFree       template.HTML
 }
 
 func init() {
 	var version bool = false
 
 	cmdSubtitleHTML = fmt.Sprintf("See <a href=\"https://%s\" target=\"_blank\">%s</a> for more info.", vcms.ProjectURL, vcms.ProjectURL)
-	cmdFooterHTML = fmt.Sprintf("<strong>%s</strong> v%s (%s), built with %s. %s", vcms.AppTitle, vcms.AppVersion, vcms.AppDate, runtime.Version(), cmdSubtitleHTML)
+	cmdFooterHTML = fmt.Sprintf("<strong>%s</strong> v%s (%s), built with %s, %s/%s. %s", vcms.AppTitle, vcms.AppVersion, vcms.AppDate, runtime.Version(), runtime.GOOS, runtime.GOARCH, cmdSubtitleHTML)
 
 	flag.BoolVar(&debug, "d", debug, "Shows debugging info")
 	flag.BoolVar(&version, "v", false, "Show version info and quit")

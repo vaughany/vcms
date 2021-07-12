@@ -1,5 +1,5 @@
 {{ define "content" }}
-  <div class="container">
+  <div class="container-flex">
 
     <h3 class="is-size-3">Nodes</h3>
 
@@ -14,6 +14,16 @@
           <th>Username</th>
           <th>First Seen</th>
           <th>Last Seen</th>
+          <th>Uptime</th>
+          <th>OS</th>
+          <th>Reboot?</th>
+          <th>Load Avgs</th>
+          <th>Mem Total</th>
+          <th>Mem Free</th>
+          <th>Swap Total</th>
+          <th>Swap Free</th>
+          <th>Disk Total</th>
+          <th>Disk Free</th>
         </tr>
       </thead>
       <tbody>
@@ -21,11 +31,21 @@
         <tr>
           <th>{{ inc $index }}</th>
           <!-- <td>{{ if .Username }}{{ .Username }}@{{ end }}{{ .Hostname }}</td> -->
-          <td>{{ .Hostname }}</td>
+          <td>{{ .Hostname }}{{ if .Errors }}{{ .Errors }}{{ end }}</td>
           <td>{{ .IPAddress }}</td>
           <td>{{ .Username }}</td>
           <td>{{ .FirstSeen }}</td>
           <td>{{ .LastSeen }}</td>
+          <td>{{ .HostUptime }}</td>
+          <td>{{ .OsVersion }}</td>
+          <td>{{ .RebootRequired }}</td>
+          <td>{{ .LoadAvgs }}</td>
+          <td>{{ .MemoryTotal }}</td>
+          <td>{{ .MemoryFree }}</td>
+          <td>{{ .SwapTotal }}</td>
+          <td>{{ .SwapFree }}</td>
+          <td>{{ .DiskTotal }}</td>
+          <td>{{ .DiskFree }}</td>
         </tr>
 {{ end }}
       </tbody>

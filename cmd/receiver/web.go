@@ -6,9 +6,11 @@ import (
 	"log"
 	"net/http"
 	"sort"
+	"strings"
 	"time"
 	"vcms"
 
+	"code.cloudfoundry.org/bytefmt"
 	"github.com/hako/durafmt"
 )
 
@@ -39,11 +41,37 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 	data.Footer = template.HTML(cmdFooterHTML)
 	for _, key := range keys {
 		var row rowData
+		if len(nodes[key].Meta.Errors) > 0 {
+			row.Errors = template.HTML(fmt.Sprintf(" <span style=\"color: red;\" title=\"%s\">ERROR!</span>", strings.Join(nodes[key].Meta.Errors, "\n")))
+		}
 		row.Hostname = template.HTML(nodes[key].Hostname)
 		row.IPAddress = template.HTML(nodes[key].IPAddress)
 		row.Username = template.HTML(nodes[key].Username)
 		row.FirstSeen = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%s ago)</small></span>", nodes[key].FirstSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].FirstSeen).Round(time.Second))))
 		row.LastSeen = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%s ago)</small></span>", nodes[key].LastSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].LastSeen).Round(time.Second))))
+		row.HostUptime = template.HTML(nodes[key].HostUptime)
+		row.OsVersion = template.HTML(nodes[key].OsVersion)
+		if nodes[key].RebootRequired {
+			row.RebootRequired = template.HTML("yes")
+		} else {
+			row.RebootRequired = template.HTML("no")
+		}
+
+		loadAvgsString := []string{}
+		for _, loadAvg := range nodes[key].LoadAvgs {
+			loadAvgsString = append(loadAvgsString, fmt.Sprintf("%.2f", loadAvg))
+		}
+		row.LoadAvgs = template.HTML(strings.Join(loadAvgsString, " "))
+
+		row.MemoryTotal = template.HTML(bytefmt.ByteSize(uint64(nodes[key].MemoryTotal * bytefmt.KILOBYTE)))
+		row.MemoryFree = template.HTML(bytefmt.ByteSize(uint64(nodes[key].MemoryFree * bytefmt.KILOBYTE)))
+		row.SwapTotal = template.HTML(bytefmt.ByteSize(uint64(nodes[key].SwapTotal * bytefmt.KILOBYTE)))
+		row.SwapFree = template.HTML(bytefmt.ByteSize(uint64(nodes[key].SwapFree * bytefmt.KILOBYTE)))
+
+		row.DiskTotal = template.HTML(bytefmt.ByteSize(uint64(nodes[key].DiskTotal * bytefmt.KILOBYTE)))
+		percentage := float64(nodes[key].DiskFree) / float64(nodes[key].DiskTotal) * 100
+		row.DiskFree = template.HTML(template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%.1f%%)</small></span>", bytefmt.ByteSize(uint64(nodes[key].DiskFree*bytefmt.KILOBYTE)), percentage)))
+
 		data.Rows = append(data.Rows, row)
 	}
 

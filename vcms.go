@@ -1,3 +1,5 @@
+// This 'vcms' package contains everything common to both programs. DRY, right?
+
 package vcms
 
 import (
@@ -12,8 +14,8 @@ AppXxx stores strings common to both the Collector and Receiver.
 ProjectURL is the URL of the project on GitHub.
 */
 const (
-	AppDate    string = "2021-07-01"
-	AppVersion string = "0.0.1"
+	AppDate    string = "2021-07-12"
+	AppVersion string = "0.0.2"
 	AppTitle   string = "Vaughany's Computer Monitoring System"
 	ProjectURL string = "github.com/vaughany/vcms"
 	AppDesc    string = "Description of the whole system goes here."
@@ -23,24 +25,27 @@ const (
 SystemData represents the data we're marshalling to JSON in the Collector, and from JSON in the Receiver.
 */
 type SystemData struct {
-	Hostname  string `json:"hostname"`
-	IPAddress string `json:"ip_address"`
-	Username  string `json:"username"`
-	FirstSeen time.Time
-	LastSeen  time.Time
-	// HostUptime     string   `json:"host_uptime"`
+	Meta struct {
+		AppVersion string   `json:"app_version"`
+		AppUptime  string   `json:"app_uptime"`
+		Errors     []string `json:"errors"`
+	}
+	Hostname       string    `json:"hostname"`
+	IPAddress      string    `json:"ip_address"`
+	Username       string    `json:"username"`
+	FirstSeen      time.Time `json:"first_seen"`
+	LastSeen       time.Time `json:"last_seen"`
+	HostUptime     string    `json:"host_uptime"`
+	OsVersion      string    `json:"os_version"`
+	RebootRequired bool      `json:"reboot_required"`
+	MemoryTotal    int       `json:"memory_total"`
+	MemoryFree     int       `json:"memory_free"`
+	SwapTotal      int       `json:"swap_total"`
+	SwapFree       int       `json:"swap_free"`
+	DiskTotal      int       `json:"disk_total"`
+	DiskFree       int       `json:"disk_free"`
+	LoadAvgs       []float64 `json:"load_avgs"`
 	// UpdateRequired bool     `json:"update_required"`
-	// RebootRequired bool     `json:"reboot_required"`
-	// OsVersion      string   `json:"os_version"`
-	// LoadAvgs       []string `json:"load_avgs"`
-	// AppUptime      string   `json:"app_uptime"`
-	// AppVersion     string   `json:"app_version"`
-	// MemoryTotal    string   `json:"memory_total"`
-	// MemoryFree     string   `json:"memory_free"`
-	// SwapTotal      string   `json:"swap_total"`
-	// SwapFree       string   `json:"swap_free"`
-	// DiskTotal      string   `json:"disk_total"`
-	// DiskFree       string   `json:"disk_free"`
 }
 
 /*

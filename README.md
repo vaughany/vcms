@@ -8,18 +8,31 @@ I've used [Munin](https://munin-monitoring.org/) for years and [M/Monit](https:/
 
 VCMS is two programs: one (called Collector) sits on a computer and monitors it's state, periodically sending the information to the other (called Receiver) which makes a nice live web page out of it.  You can have as many collectors on as many computers as you like.
 
-This project is the result of a much larger, private project in which I attempted too much too soon, with minimal Go knowledge.  The scope crept faster than my knowledge and ability to implement it, and it got unwieldly and complex, so this is me 'starting over', one feature at a time.
+This project is the result of a much larger, private project in which I attempted too much too soon, with minimal Go knowledge.  The scope crept faster than my knowledge and ability to implement it, and it got unwieldly and complex, so this is me 'starting over', one feature at a time.  
 
+This project is by no means feature complete and probably won't be for a while, and is being written Linux-first (specifically Ubuntu). I know less about the inner workings of Windows than I used to due to simply not using it regularly for years, but it's my intention to make all reported details work for Linux, Windows and macOS in time.
 
-### Metrics recorded
+### Metrics reported
 
-* hostname
+Version 0.0.1:
+
+* hostname 
 * username
 * IP address
 * first seen
 * last seen
 
-> **Note:** this project is in no way feature-complete!
+Added in version 0.0.2:
+
+* uptime
+* operating system
+* if a reboot is required (Linux)
+* load averages (Linux)
+* memory, total and free (Linux)
+* swap memory, total and free (Linux)
+* disk space, total and free  (Linux)
+
+> **Reminder:** this project is in no way feature-complete!
 
 ### Tested with:
 
@@ -210,12 +223,22 @@ There's a lot I want to do:
 * Web-based, Email and Slack notifications of alerts.
 * Monitor software deployed by the Ruby gem Capistrano.
 * Make web page refresh configurable.
+* Report any data-collecting errors in the Collector through to the Receiver.
+* JSON export.
 
 ---
 
 ## History
 
 * **2021-07-01**, v0.0.1.  Initial release.  Collector registers basic info with the Receiver.
+* **2021-07-xx**, v0.0.2.  Collects more information, but only on Linux.  Change to struct to allow 'meta' data such as app version, errors.  Version check: Receiver will reject data if the Collector is not the same version.
+
+---
+
+## Packages used
+
+* [cloudfoundry/bytefmt](https://github.com/cloudfoundry/bytefmt/) for human-readable byte formatter.
+* [hako/durafmt](https://github.com/hako/durafmt) human-readable formatting of time.Duration.
 
 ---
 

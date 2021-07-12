@@ -3,13 +3,20 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/user"
+	"regexp"
+	"runtime"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 	"vcms"
@@ -22,10 +29,11 @@ const (
 )
 
 var (
-	debug       bool   = false
-	testing     bool   = false
-	version     bool   = false
-	receiverURL string = "http://127.0.0.1:8080"
+	debug       bool      = false
+	testing     bool      = false
+	version     bool      = false
+	receiverURL string    = "http://127.0.0.1:8080"
+	startTime   time.Time = time.Now()
 )
 
 func init() {
@@ -61,17 +69,39 @@ func sendAnnounce() {
 
 	data := vcms.SystemData{}
 
+	// Data that will not change.
+	data.Hostname = getHostname()
+	data.IPAddress = getIPAddress()
+	data.Username = getUsername()
+	data.OsVersion = getOsVersion()
+
+	// Adjust some of the core data if we're testing.
 	if testing {
 		data.Hostname = getRandomHostname()
 		data.IPAddress = getRandomIPAddress()
 		data.Username = getRandomUsername()
-	} else {
-		data.Hostname = getHostname()
-		data.IPAddress = getIPAddress()
-		data.Username = getUsername()
 	}
 
 	for {
+		var errors []string
+
+		memoryDetails := getMemoryDetails()
+		diskDetails := getDiskDetails()
+
+		// Data that will change.
+		data.HostUptime = getHostUptime()
+		data.RebootRequired = getRebootRequired()
+		data.MemoryTotal = memoryDetails[0]
+		data.MemoryFree = memoryDetails[1]
+		data.SwapTotal = memoryDetails[2]
+		data.SwapFree = memoryDetails[3]
+		data.DiskTotal = diskDetails[0]
+		data.DiskFree = diskDetails[1]
+		data.LoadAvgs = getLoadAvgs()
+		data.Meta.AppVersion = vcms.AppVersion
+		data.Meta.AppUptime = getAppUptime()
+		data.Meta.Errors = errors
+
 		jsonBytes, err := json.Marshal(data)
 		if err != nil {
 			log.Panic(err)
@@ -85,18 +115,19 @@ func sendAnnounce() {
 		}
 
 		response, err := http.Post(sendURL, "application/json", bytes.NewBuffer(jsonBytes))
-
 		if err != nil {
 			log.Print(err)
 			printLastSuccessfulSend(lastSuccessfulSend)
+			return
+		}
+
+		log.Printf("Response: %s", response.Status)
+		if response.StatusCode == 200 {
+			lastSuccessfulSend = time.Now()
 		} else {
-			log.Printf("Response: %s", response.Status)
-			if response.StatusCode != 200 {
-				// This is fundamentally an error, so handle it.
-				log.Print(response)
-			} else {
-				lastSuccessfulSend = time.Now()
-			}
+			body, _ := io.ReadAll(response.Body)
+			log.Print(string(body))
+			printLastSuccessfulSend(lastSuccessfulSend)
 		}
 
 		time.Sleep(time.Second * time.Duration(watchDelay))
@@ -164,6 +195,118 @@ func getUsername() string {
 	return user.Username
 }
 
+func getHostUptime() string {
+	if runtime.GOOS == "windows" {
+		log.Println("WARNING: 'getHostUptime()' function not yet implemented for Windows.")
+		return ""
+	}
+
+	contents, err := os.ReadFile("/proc/uptime")
+	if err != nil {
+		log.Println(err)
+	}
+
+	uptimeInt, err := strconv.Atoi(strings.Split(strings.Split(string(contents), " ")[0], ".")[0])
+	if err != nil {
+		log.Println(err)
+	}
+
+	return time.Since(time.Unix(time.Now().Unix()-int64(uptimeInt), 0)).Round(time.Second).String()
+}
+
+func getOsVersion() string {
+	if runtime.GOOS == "windows" {
+		log.Println("WARNING: 'getOsVersion()' function not yet implemented for Windows.")
+		return ""
+	}
+
+	release, err := os.ReadFile("/etc/os-release")
+	if err != nil {
+		log.Panic(err)
+	}
+
+	regexName := regexp.MustCompile(`PRETTY_NAME=.*`)
+	name := regexName.FindString(string(release))
+
+	return name[13 : len(name)-1]
+}
+
+func getRebootRequired() bool {
+	if runtime.GOOS == "windows" {
+		log.Println("WARNING: 'getRebootRequired()' function not yet implemented for Windows.")
+		return false
+	}
+
+	filename := "/var/run/reboot-required"
+	if _, err := os.Stat(filename); errors.Is(err, os.ErrNotExist) {
+		return false
+	}
+	return true
+}
+
+func getMemoryDetails() []int {
+	if runtime.GOOS == "windows" {
+		log.Println("WARNING: 'getMemoryDetails()' function not yet implemented for Windows.")
+		return []int{0, 0, 0, 0}
+	}
+
+	memory, err := os.ReadFile("/proc/meminfo")
+	if err != nil {
+		log.Panic(err)
+	}
+
+	// https://stackoverflow.com/a/30483899/254146
+	regexMemTotal := regexp.MustCompile(`MemTotal:\s+(?P<MemTotal>\d+).+`)
+	regexMemFree := regexp.MustCompile(`MemFree:\s+(?P<MemFree>\d+).+`)
+	regexSwapTotal := regexp.MustCompile(`SwapTotal:\s+(?P<SwapTotal>\d+).+`)
+	regexSwapFree := regexp.MustCompile(`SwapFree:\s+(?P<SwapFree>\d+).+`)
+
+	memTotal, _ := strconv.Atoi(regexMemTotal.FindStringSubmatch(string(memory))[1])
+	memFree, _ := strconv.Atoi(regexMemFree.FindStringSubmatch(string(memory))[1])
+	swapTotal, _ := strconv.Atoi(regexSwapTotal.FindStringSubmatch(string(memory))[1])
+	swapFree, _ := strconv.Atoi(regexSwapFree.FindStringSubmatch(string(memory))[1])
+
+	return []int{memTotal, memFree, swapTotal, swapFree}
+}
+
+func getDiskDetails() []int {
+	if runtime.GOOS == "windows" {
+		log.Println("WARNING: 'getDiskDetails()' function not yet implemented for Windows.")
+		return []int{0, 0}
+	}
+
+	disk, err := exec.Command("df", "/").Output()
+	if err != nil {
+		log.Panic(err)
+	}
+
+	regexDisk := regexp.MustCompile(`\s+(?P<Size>\d+)\s+(?P<Used>\d+)\s+(?P<Avail>\d+)`)
+
+	diskTotal, _ := strconv.Atoi(regexDisk.FindStringSubmatch(string(disk))[1])
+	diskFree, _ := strconv.Atoi(regexDisk.FindStringSubmatch(string(disk))[3])
+
+	return []int{diskTotal, diskFree}
+}
+
+func getLoadAvgs() []float64 {
+	if runtime.GOOS == "windows" {
+		log.Println("WARNING: 'getLoadAvgs()' function not yet implemented for Windows.")
+		return []float64{0, 0, 0}
+	}
+
+	load, err := os.ReadFile("/proc/loadavg")
+	if err != nil {
+		log.Panic(err)
+	}
+
+	loads := strings.Split(string(load), " ")
+	one, _ := strconv.ParseFloat(loads[0], 64)
+	five, _ := strconv.ParseFloat(loads[1], 64)
+	fifteen, _ := strconv.ParseFloat(loads[2], 64)
+
+	return []float64{one, five, fifteen}
+}
+
 func printLastSuccessfulSend(t time.Time) {
 	msg := "Last successful data send:"
 	if t.IsZero() {
@@ -171,4 +314,8 @@ func printLastSuccessfulSend(t time.Time) {
 	} else {
 		log.Printf("%s %s (%s ago)\n", msg, t.Format(time.RFC1123Z), time.Since(t).Round(time.Second))
 	}
+}
+
+func getAppUptime() string {
+	return time.Since(startTime).Round(time.Second).String()
 }
