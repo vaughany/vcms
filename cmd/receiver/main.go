@@ -101,6 +101,7 @@ func main() {
 	http.HandleFunc("/api/ping", apiPingHandler)
 
 	log.Printf("Running web server on http://%s.", receiverURL)
+	log.Printf("To connect a Collector, run: './collector -r http://%s'.", receiverURL)
 	log.Fatal(http.ListenAndServe(receiverURL, nil))
 }
 
