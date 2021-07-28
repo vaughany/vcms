@@ -17,9 +17,9 @@ func apiAnnounceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if debug {
-		log.Printf("Received %s from %s", jsonBytes, r.Host)
+		log.Printf("Received %s from %s", jsonBytes, r.RemoteAddr)
 	} else {
-		log.Printf("Received data from %s", r.Host)
+		log.Printf("Received data from %s", r.RemoteAddr)
 	}
 
 	// Unmarshall JSON.
