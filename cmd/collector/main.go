@@ -118,16 +118,15 @@ func sendAnnounce() {
 		if err != nil {
 			log.Print(err)
 			printLastSuccessfulSend(lastSuccessfulSend)
-			return
-		}
-
-		log.Printf("Response: %s", response.Status)
-		if response.StatusCode == 200 {
-			lastSuccessfulSend = time.Now()
 		} else {
-			body, _ := io.ReadAll(response.Body)
-			log.Print(string(body))
-			printLastSuccessfulSend(lastSuccessfulSend)
+			log.Printf("Response: %s", response.Status)
+			if response.StatusCode == 200 {
+				lastSuccessfulSend = time.Now()
+			} else {
+				body, _ := io.ReadAll(response.Body)
+				log.Print(string(body))
+				printLastSuccessfulSend(lastSuccessfulSend)
+			}
 		}
 
 		time.Sleep(time.Second * time.Duration(watchDelay))
