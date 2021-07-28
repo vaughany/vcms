@@ -214,9 +214,25 @@ func getHostUptime() string {
 }
 
 func getOsVersion() string {
+	// https://en.wikipedia.org/wiki/List_of_Microsoft_Windows_versions
+	// https://gist.github.com/flxxyz/ae3ef071dc4ffb0c55daedc7f0740611
 	if runtime.GOOS == "windows" {
-		log.Println("WARNING: 'getOsVersion()' function not yet implemented for Windows.")
-		return ""
+		// log.Println("WARNING: 'getOsVersion()' function not yet implemented for Windows.")
+		// return ""
+
+		cmd := exec.Command("cmd.exe")
+		out, _ := cmd.StdoutPipe()
+		buffer := bytes.NewBuffer(make([]byte, 0))
+		cmd.Start()
+		buffer.ReadFrom(out)
+		str, _ := buffer.ReadString(']')
+		cmd.Wait()
+
+		remove := []string{"[", "Version", "]"}
+		for _, r := range remove {
+			str = strings.ReplaceAll(str, r, "")
+		}
+		return str
 	}
 
 	release, err := os.ReadFile("/etc/os-release")
