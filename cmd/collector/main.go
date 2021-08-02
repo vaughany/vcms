@@ -69,21 +69,15 @@ func sendAnnounce() {
 
 	data := vcms.SystemData{}
 
-	// Data that will not change.
-	data.Hostname = getHostname()
-	data.IPAddress = getIPAddress()
-	data.Username = getUsername()
-	data.OsVersion = getOsVersion()
-
-	// Adjust some of the core data if we're testing.
-	if testing {
-		data.Hostname = getRandomHostname()
-		data.IPAddress = getRandomIPAddress()
-		data.Username = getRandomUsername()
-	}
-
 	for {
 		var errors []string
+
+		// Data that will not change. // lol
+		data.Hostname = getHostname()
+		data.IPAddress = getIPAddress()
+		data.Username = getUsername()
+		data.OsVersion = getOsVersion()
+		data.CPUCount, data.CPUSpeed = getCPUDetails()
 
 		memoryDetails := getMemoryDetails()
 		diskDetails := getDiskDetails()
@@ -101,6 +95,13 @@ func sendAnnounce() {
 		data.Meta.AppVersion = vcms.AppVersion
 		data.Meta.AppUptime = getAppUptime()
 		data.Meta.Errors = errors
+
+		// Adjust some of the core data if we're testing.
+		if testing {
+			data.Hostname = getRandomHostname()
+			data.IPAddress = getRandomIPAddress()
+			data.Username = getRandomUsername()
+		}
 
 		jsonBytes, err := json.Marshal(data)
 		if err != nil {
@@ -214,9 +215,10 @@ func getHostUptime() string {
 }
 
 func getOsVersion() string {
-	// https://en.wikipedia.org/wiki/List_of_Microsoft_Windows_versions
-	// https://gist.github.com/flxxyz/ae3ef071dc4ffb0c55daedc7f0740611
-	if runtime.GOOS == "windows" {
+	switch runtime.GOOS {
+	case "windows":
+		// https://en.wikipedia.org/wiki/List_of_Microsoft_Windows_versions
+		// https://gist.github.com/flxxyz/ae3ef071dc4ffb0c55daedc7f0740611
 		// log.Println("WARNING: 'getOsVersion()' function not yet implemented for Windows.")
 		// return ""
 
@@ -233,17 +235,21 @@ func getOsVersion() string {
 			str = strings.ReplaceAll(str, r, "")
 		}
 		return str
+
+	case "linux":
+		release, err := os.ReadFile("/etc/os-release")
+		if err != nil {
+			log.Panic(err)
+		}
+
+		regexName := regexp.MustCompile(`PRETTY_NAME=.*`)
+		name := regexName.FindString(string(release))
+
+		return name[13 : len(name)-1]
+
+	default:
+		return "Unknown"
 	}
-
-	release, err := os.ReadFile("/etc/os-release")
-	if err != nil {
-		log.Panic(err)
-	}
-
-	regexName := regexp.MustCompile(`PRETTY_NAME=.*`)
-	name := regexName.FindString(string(release))
-
-	return name[13 : len(name)-1]
 }
 
 func getRebootRequired() bool {
@@ -333,4 +339,25 @@ func printLastSuccessfulSend(t time.Time) {
 
 func getAppUptime() string {
 	return time.Since(startTime).Round(time.Second).String()
+}
+
+func getCPUDetails() (int, string) {
+	if runtime.GOOS == "windows" {
+		log.Println("WARNING: 'getCPUDetails()' function not yet implemented for Windows.")
+		return 0, ""
+	}
+
+	cpuinfo, err := os.ReadFile("/proc/cpuinfo")
+	if err != nil {
+		log.Panic(err)
+	}
+
+	regex := regexp.MustCompile(`model name\s+:\s.*`)
+	cpuDetails := regex.FindAllSubmatch(cpuinfo, -1)
+	cpuDetailsSlice := strings.Split(string(cpuDetails[0][0]), " ")
+
+	count := len(cpuDetails)
+	speed := fmt.Sprint(cpuDetailsSlice[len(cpuDetailsSlice)-1])
+
+	return count, speed
 }

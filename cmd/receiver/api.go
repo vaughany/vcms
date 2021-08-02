@@ -50,21 +50,23 @@ func apiAnnounceHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: We're assuming that hostnames are unique. They might not be. Maybe the map's key should be 'hostname+ipaddress'?
 	if _, ok := nodes[data.Hostname]; !ok {
 		nodes[data.Hostname] = &vcms.SystemData{
-			Username:  data.Username, // These things pretty much stay the same.
-			Hostname:  data.Hostname,
-			IPAddress: data.IPAddress,
-			FirstSeen: time.Now(),
-			OsVersion: data.OsVersion,
-			// LastSeen:       time.Now(), // These things change.
-			// HostUptime:     data.HostUptime,
-			// RebootRequired: data.RebootRequired,
-			// LoadAvgs:       data.LoadAvgs,
-			// MemoryTotal:    data.MemoryTotal,
-			// MemoryFree:     data.MemoryFree,
-			// SwapTotal:      data.SwapTotal,
-			// SwapFree:       data.SwapFree,
-			// DiskTotal:      data.DiskTotal,
-			// DiskFree:       data.DiskFree,
+			Username:       data.Username, // These things pretty much stay the same.
+			Hostname:       data.Hostname,
+			IPAddress:      data.IPAddress,
+			FirstSeen:      time.Now(),
+			OsVersion:      data.OsVersion,
+			CPUCount:       data.CPUCount,
+			CPUSpeed:       data.CPUSpeed,
+			LastSeen:       time.Now(), // These things change.
+			HostUptime:     data.HostUptime,
+			RebootRequired: data.RebootRequired,
+			LoadAvgs:       data.LoadAvgs,
+			MemoryTotal:    data.MemoryTotal,
+			MemoryFree:     data.MemoryFree,
+			SwapTotal:      data.SwapTotal,
+			SwapFree:       data.SwapFree,
+			DiskTotal:      data.DiskTotal,
+			DiskFree:       data.DiskFree,
 		}
 	} else {
 		nodes[data.Hostname].LastSeen = time.Now()

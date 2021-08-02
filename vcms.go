@@ -14,8 +14,8 @@ AppXxx stores strings common to both the Collector and Receiver.
 ProjectURL is the URL of the project on GitHub.
 */
 const (
-	AppDate    string = "2021-07-12"
-	AppVersion string = "0.0.2"
+	AppDate    string = "2021-08-02"
+	AppVersion string = "0.0.3"
 	AppTitle   string = "Vaughany's Computer Monitoring System"
 	ProjectURL string = "github.com/vaughany/vcms"
 	AppDesc    string = "Description of the whole system goes here."
@@ -45,6 +45,8 @@ type SystemData struct {
 	DiskTotal      int       `json:"disk_total"`
 	DiskFree       int       `json:"disk_free"`
 	LoadAvgs       []float64 `json:"load_avgs"`
+	CPUCount       int       `json:"cpu_count"`
+	CPUSpeed       string    `json:"cpu_speed"`
 	// UpdateRequired bool     `json:"update_required"`
 }
 

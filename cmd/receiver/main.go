@@ -52,6 +52,7 @@ type rowData struct {
 	LastSeen       template.HTML
 	HostUptime     template.HTML
 	OsVersion      template.HTML
+	CPU            template.HTML
 	RebootRequired template.HTML
 	LoadAvgs       template.HTML
 	MemoryTotal    template.HTML

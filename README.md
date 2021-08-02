@@ -4,15 +4,15 @@
 
 ## What is VCMS?
 
-> **tl;dr:**  VCMS is a work-in-progress cross-platform multi-computer health monitoring tool, and is a side-project I am working on to learn [Go](https://golang.org/).  Be kind!
+> **tl;dr:**  VCMS is a work-in-progress cross-platform zero-config multi-computer health monitoring tool, and is a side-project I am working on to learn [Go](https://golang.org/).  Be kind!
 
-I've used [Munin](https://munin-monitoring.org/) for years and [M/Monit](https://mmonit.com/) a lot also.  Both are excellet montoring solutions.  I wanted to try my hand at something similar, as a learning exercise.
+I've used [Munin](https://munin-monitoring.org/) for years and [M/Monit](https://mmonit.com/) a lot also.  Both are excellet montoring solutions.  I wanted to try my hand at something similar, as a learning exercise.  *This project doesn't (yet) do anything that Munin or M/Monit don't already do,* but the upside is that it's really, really simple.
 
 VCMS is two programs: one (called Collector) sits on a computer and monitors it's state, periodically sending the information to the other (called Receiver) which makes a nice live web page out of it.  You can have as many collectors on as many computers as you like.
 
 This project is the result of a much larger, private project in which I attempted too much too soon, with minimal Go knowledge.  The scope crept faster than my knowledge and ability to implement it, and it got unwieldly and complex, so this is me 'starting over', one feature at a time.  
 
-This project is by no means feature complete and probably won't be for a while, and is being written Linux-first (specifically Ubuntu). I know less about the inner workings of Windows than I used to due to simply not using it regularly for years, but it's my intention to make all reported details work for Linux, Windows and macOS in time.
+This project is by no means feature complete and probably won't be for a while, and is being written *Linux-first*. I know less about the inner workings of Windows than I used to due to simply not using it regularly for years, but it's my intention to make all reported details work for Linux, Windows and macOS in time.
 
 ### Metrics reported
 
@@ -32,16 +32,45 @@ Added in version 0.0.2:
 * load averages (Linux)
 * memory, total and free (Linux)
 * swap memory, total and free (Linux)
-* disk space, total and free  (Linux)
+* disk space, total and free (Linux)
+
+Added in version 0.0.3:
+
+* CPU number and clock speed (Linux)
 
 > **Reminder:** this project is in no way feature-complete!
 
-### Tested with:
+### Tested with
 
-* Ubuntu:
-  * ~~16.04 LTS~~
-  * 18.04 LTS
-  * ~~20.04 LTS~~
+I aim to test both Receiver and Collector programs on as many OSes and architectures as I reasonably can, but it's going to be the amd64/x86_64 versions of OSes I can easily download and use via [Vagrant](https://www.vagrantup.com/) in the first instance.
+
+* Debian
+  * 8 / Jessie
+  * 9 / Stretch
+  * 10 / Buster
+  * ~~11 / Bullseye~~
+* Ubuntu (recent LTS versions and supported non-LTS versions since the last LTS version):
+  * ~~16.04 LTS / Xenial Xerus~~
+  * 18.04 LTS / Bionic Beaver
+  * 20.04 LTS / Focal Fossa
+  * 20.10 / Groovy Gorilla
+  * 21.04 / Hirsute Hippo
+* openSUSE
+  * Leap 15
+  * Tumbleweed
+* Red Hat Enterprise Linux
+  * 7 / Maipo
+  * 8 / Ootpa
+* CentOS
+  * ~~Linux 7~~
+  * ~~Linux 8~~
+  * Stream 8
+* Fedora
+  * 34 (Cloud Edition)
+  * 33 (Cloud Edition)
+* Oracle
+  * 7
+  * 8
 * Windows:
   * ~~10~~
 
@@ -118,7 +147,7 @@ Added in version 0.0.2:
 
 ## Better Linux installation
 
-By default, the Receiver runs the web page and API on `127.0.0.1` ('localhost') on port 8080.  These are fair defaults, but won't work outside your computer.
+By default, the Receiver runs the web page and API on `127.0.0.1` ('localhost') on port `8080`.  These are fair defaults, but won't work outside your computer.
 
 Both programs allow you to specify the IP address and port to use with the `-r` flag.  
 
@@ -189,7 +218,14 @@ If you have Go installed, clone the repo and build it yourself.
 
    `go build -trimpath -ldflags "-s -w" -o bin/ ./cmd/...`
 
-5. Alternatively, run the helper script `./build.sh` to build Linux and Windows binaries.  Add or amend as you see fit to build as many different binaries as required.
+5. Alternatively, run the helper script `./build.sh` to build Linux and Windows binaries.
+
+   Add or amend as you see fit to build as many different binaries as required.  To see a list of possible OSes and architectures, run `go tool dist list`, and then add new lines, e.g.
+
+   ```
+   echo -e "\e[1mBuilding macOS/Arm64...'\e[0m"
+   env GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags "-s -w" -o bin/ ./cmd/...
+   ```
 
 6. Run the Collector:
 
@@ -209,6 +245,8 @@ If you have Go installed, clone the repo and build it yourself.
 
 3. We currently only use HTTP, which means your data is not encrypted in transit.  For my intended use, this is not a huge concern, but it might be for you.  Addressing this is on the to-do list.
 
+4. Internally, data is stored with the hostname as the primary key, so if you have two servers with the same hostname, they'll only appear as one, and the details of each will be constantly overwritten by the other.  I doubt this will be a problem during regular use, but it caught me out during testing.
+
 ---
 
 ## To do
@@ -226,7 +264,16 @@ There's a lot I want to do:
 * Monitor software deployed by the Ruby gem Capistrano.
 * Make web page refresh configurable.
 * Report any data-collecting errors in the Collector through to the Receiver.
-* JSON export.
+* Export to:
+  * JSON
+  * HTML (web page saved locally, regularly)
+* Web app:
+  * Page listing just the hosts
+  * Page listing just the distributions
+  * Page listing just one host
+  * Add distro icon
+  * Add 'delete' button.
+* Consider using github.com/shirou/gopsutil for OS details.
 
 ---
 
@@ -234,6 +281,7 @@ There's a lot I want to do:
 
 * **2021-07-01**, v0.0.1.  Initial release.  Collector registers basic info with the Receiver.
 * **2021-07-xx**, v0.0.2.  Collects more information, but only on Linux.  Change to struct to allow 'meta' data such as app version, errors.  Version check: Receiver will reject data if the Collector is not the same version.
+* **2021-08-02**, v0.0.3.  Bug fixes: using host address, not remote address; hung on failed data send.  Ensured changing data is logged on first attempt: it's anti-DRY, but the web page doesn't look like it's broken now.  Added basic Windows version string.  Tested Collector on many versions of Linux, and Windows 10.  Added CPU count and clock speed.  Added more future to-do's to readme.
 
 ---
 

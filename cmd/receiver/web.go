@@ -51,6 +51,7 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 		row.LastSeen = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%s ago)</small></span>", nodes[key].LastSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].LastSeen).Round(time.Second))))
 		row.HostUptime = template.HTML(nodes[key].HostUptime)
 		row.OsVersion = template.HTML(nodes[key].OsVersion)
+		row.CPU = getCPUHTML(nodes[key])
 		if nodes[key].RebootRequired {
 			row.RebootRequired = template.HTML("yes")
 		} else {
@@ -90,4 +91,12 @@ func logoHandler(w http.ResponseWriter, r *http.Request) {
 
 func faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./assets/img/favicon.png")
+}
+
+func getCPUHTML(node *vcms.SystemData) template.HTML {
+	if node.CPUCount == 0 {
+		return template.HTML("-")
+	}
+
+	return template.HTML(fmt.Sprintf("%d, %s", node.CPUCount, node.CPUSpeed))
 }
