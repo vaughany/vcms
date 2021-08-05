@@ -76,7 +76,7 @@ func sendAnnounce() {
 		data.Hostname = getHostname()
 		data.IPAddress = getIPAddress()
 		data.Username = getUsername()
-		data.OsVersion = getOsVersion()
+		data.OSVersion = getOSVersion()
 		data.CPUCount, data.CPUSpeed = getCPUDetails()
 
 		memoryDetails := getMemoryDetails()
@@ -200,10 +200,14 @@ func getHostUptime() string {
 		log.Println("WARNING: 'getHostUptime()' function not yet implemented for Windows.")
 		return ""
 	}
+	if runtime.GOOS == "solaris" {
+		log.Println("WARNING: 'getHostUptime()' function not yet implemented for Solaris.")
+		return ""
+	}
 
 	contents, err := os.ReadFile("/proc/uptime")
 	if err != nil {
-		log.Println(err)
+		log.Panic(err)
 	}
 
 	uptimeInt, err := strconv.Atoi(strings.Split(strings.Split(string(contents), " ")[0], ".")[0])
@@ -214,7 +218,7 @@ func getHostUptime() string {
 	return time.Since(time.Unix(time.Now().Unix()-int64(uptimeInt), 0)).Round(time.Second).String()
 }
 
-func getOsVersion() string {
+func getOSVersion() string {
 	switch runtime.GOOS {
 	case "windows":
 		// https://en.wikipedia.org/wiki/List_of_Microsoft_Windows_versions
@@ -247,8 +251,19 @@ func getOsVersion() string {
 
 		return name[13 : len(name)-1]
 
+	case "solaris":
+		release, err := os.ReadFile("/etc/release")
+		if err != nil {
+			log.Panic(err)
+		}
+
+		regexName := regexp.MustCompile(`^\s+Oracle\s.*`)
+		name := regexName.FindString(string(release))
+
+		return strings.Join(strings.Fields(name)[0:3], " ")
+
 	default:
-		return "Unknown"
+		return ""
 	}
 }
 
@@ -268,6 +283,10 @@ func getRebootRequired() bool {
 func getMemoryDetails() []int {
 	if runtime.GOOS == "windows" {
 		log.Println("WARNING: 'getMemoryDetails()' function not yet implemented for Windows.")
+		return []int{0, 0, 0, 0}
+	}
+	if runtime.GOOS == "solaris" {
+		log.Println("WARNING: 'getMemoryDetails()' function not yet implemented for Solaris.")
 		return []int{0, 0, 0, 0}
 	}
 
@@ -296,7 +315,7 @@ func getDiskDetails() []int {
 		return []int{0, 0}
 	}
 
-	disk, err := exec.Command("df", "/").Output()
+	disk, err := exec.Command("df", "-k", "/").Output()
 	if err != nil {
 		log.Panic(err)
 	}
@@ -312,6 +331,10 @@ func getDiskDetails() []int {
 func getLoadAvgs() []float64 {
 	if runtime.GOOS == "windows" {
 		log.Println("WARNING: 'getLoadAvgs()' function not yet implemented for Windows.")
+		return []float64{0, 0, 0}
+	}
+	if runtime.GOOS == "solaris" {
+		log.Println("WARNING: 'getLoadAvgs()' function not yet implemented for Solaris.")
 		return []float64{0, 0, 0}
 	}
 
@@ -344,6 +367,10 @@ func getAppUptime() string {
 func getCPUDetails() (int, string) {
 	if runtime.GOOS == "windows" {
 		log.Println("WARNING: 'getCPUDetails()' function not yet implemented for Windows.")
+		return 0, ""
+	}
+	if runtime.GOOS == "solaris" {
+		log.Println("WARNING: 'getCPUDetails()' function not yet implemented for Solaris.")
 		return 0, ""
 	}
 

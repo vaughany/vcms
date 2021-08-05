@@ -54,7 +54,7 @@ func apiAnnounceHandler(w http.ResponseWriter, r *http.Request) {
 			Hostname:       data.Hostname,
 			IPAddress:      data.IPAddress,
 			FirstSeen:      time.Now(),
-			OsVersion:      data.OsVersion,
+			OSVersion:      data.OSVersion,
 			CPUCount:       data.CPUCount,
 			CPUSpeed:       data.CPUSpeed,
 			LastSeen:       time.Now(), // These things change.

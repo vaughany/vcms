@@ -50,7 +50,7 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 		row.FirstSeen = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%s ago)</small></span>", nodes[key].FirstSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].FirstSeen).Round(time.Second))))
 		row.LastSeen = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%s ago)</small></span>", nodes[key].LastSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].LastSeen).Round(time.Second))))
 		row.HostUptime = template.HTML(nodes[key].HostUptime)
-		row.OsVersion = template.HTML(nodes[key].OsVersion)
+		row.OSVersion = template.HTML(nodes[key].OSVersion)
 		row.CPU = getCPUHTML(nodes[key])
 		if nodes[key].RebootRequired {
 			row.RebootRequired = template.HTML("yes")
@@ -73,6 +73,8 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 		percentage := float64(nodes[key].DiskFree) / float64(nodes[key].DiskTotal) * 100
 		row.DiskFree = template.HTML(template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%.1f%%)</small></span>", bytefmt.ByteSize(uint64(nodes[key].DiskFree*bytefmt.KILOBYTE)), percentage)))
 
+		row.OSImage = getOSImage(nodes[key])
+
 		data.Rows = append(data.Rows, row)
 	}
 
@@ -85,13 +87,13 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Dashboard accessed.")
 }
 
-func logoHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./assets/img/logo.png")
-}
+// func logoHandler(w http.ResponseWriter, r *http.Request) {
+// 	http.ServeFile(w, r, "./assets/img/logo.png")
+// }
 
-func faviconHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./assets/img/favicon.png")
-}
+// func faviconHandler(w http.ResponseWriter, r *http.Request) {
+// 	http.ServeFile(w, r, "./assets/img/favicon.png")
+// }
 
 func getCPUHTML(node *vcms.SystemData) template.HTML {
 	if node.CPUCount == 0 {
@@ -99,4 +101,56 @@ func getCPUHTML(node *vcms.SystemData) template.HTML {
 	}
 
 	return template.HTML(fmt.Sprintf("%d, %s", node.CPUCount, node.CPUSpeed))
+}
+
+func getOSImage(node *vcms.SystemData) string {
+	input := strings.ToLower(node.OSVersion)
+	switch {
+	case strings.Contains(input, "arch"):
+		return "arch"
+	case strings.Contains(input, "centos"):
+		return "centos"
+	case strings.Contains(input, "debian"):
+		return "debian"
+	case strings.Contains(input, "fedora"):
+		return "fedora"
+	case strings.Contains(input, "kali"):
+		return "kali"
+	// case strings.Contains(input, "kubuntu"): // Kubuntu identifies itself as Ubuntu.
+	// 	return "kubuntu"
+	// case strings.Contains(input, "lubuntu"): // Lubuntu identifies itself as Ubuntu.
+	// 	return "lubuntu"
+	case strings.Contains(input, "manjaro"):
+		return "manjaro"
+	case strings.Contains(input, "mint"):
+		return "mint"
+	// case strings.Contains(input, "mx"): // MX identifies itself as Debian.
+	// 	return "mx"
+	case strings.Contains(input, "opensuse"):
+		return "opensuse"
+	case strings.Contains(input, "oracle solaris"):
+		return "solaris"
+	case strings.Contains(input, "oracle"):
+		return "oracle"
+	case strings.Contains(input, "red hat"):
+		return "redhat"
+	case strings.Contains(input, "ubuntu"):
+		return "ubuntu"
+	case strings.Contains(input, "windows"):
+		return "windows"
+	default:
+		return "generic"
+	}
+}
+
+func saveToPersistentStorageHandler(w http.ResponseWriter, r *http.Request) {
+	saveToPersistentStorage()
+
+	http.Redirect(w, r, "/dashboard", http.StatusTemporaryRedirect)
+}
+
+func loadFromPersistentStorageHandler(w http.ResponseWriter, r *http.Request) {
+	loadFromPersistentStorage()
+
+	http.Redirect(w, r, "/dashboard", http.StatusTemporaryRedirect)
 }

@@ -1,6 +1,6 @@
 # VCMS - Vaughany's Computer Monitoring System
 
-![Screenshot of v0.0.2](./screenshots/v0.0.2.png)
+![Screenshot of v0.0.4](./screenshots/v0.0.4.png)
 
 ## What is VCMS?
 
@@ -44,35 +44,44 @@ Added in version 0.0.3:
 
 I aim to test both Receiver and Collector programs on as many OSes and architectures as I reasonably can, but it's going to be the amd64/x86_64 versions of OSes I can easily download and use via [Vagrant](https://www.vagrantup.com/) in the first instance.
 
-* Debian
+* Debian:
   * 8 / Jessie
   * 9 / Stretch
   * 10 / Buster
   * ~~11 / Bullseye~~
 * Ubuntu (recent LTS versions and supported non-LTS versions since the last LTS version):
-  * ~~16.04 LTS / Xenial Xerus~~
+  * 16.04 LTS / Xenial Xerus
   * 18.04 LTS / Bionic Beaver
   * 20.04 LTS / Focal Fossa
   * 20.10 / Groovy Gorilla
   * 21.04 / Hirsute Hippo
-* openSUSE
+  * Kubuntu versions as Ubuntu versions
+  * Lubuntu versions as Ubuntu versions
+* openSUSE:
   * Leap 15
   * Tumbleweed
-* Red Hat Enterprise Linux
+* Red Hat Enterprise Linux:
   * 7 / Maipo
   * 8 / Ootpa
-* CentOS
+* CentOS:
   * ~~Linux 7~~
-  * ~~Linux 8~~
+  * Linux 8
   * Stream 8
-* Fedora
+* Fedora:
   * 34 (Cloud Edition)
   * 33 (Cloud Edition)
-* Oracle
+* Oracle:
   * 7
   * 8
+* Kali:
+  * ~~Rolling~~
+* Solaris:
+  * 11
+* ~~BSD~~
+* ~~IBM OS / 2~~
+* ~~macOS~~
 * Windows:
-  * ~~10~~
+  * 10
 
 ---
 
@@ -178,7 +187,7 @@ Both programs allow you to specify the IP address and port to use with the `-r` 
 
 ## Use
 
-When you run the Receiver, it mentions a URL (`http://127.0.0.1:8080` by default).  Click it, or copy-paste it into your web browser.  You should see a nice, if basic web page detailing the hosts in alphabetical order of host.  Web page accesses are logged.  The page will automatically refresh every 60 seconds.
+When you run the Receiver, it mentions a URL (`http://127.0.0.1:8080` by default).  Click it, or copy-paste it into your web browser.  You should see a nice, if basic web page detailing the hosts in alphabetical order of host (as per the screenshot at the top).  Web page accesses are logged.  The page will automatically refresh every 60 seconds.
 
 A 'ping' API endpoint is provided so you can check if the Receiver is responding:
 
@@ -253,7 +262,7 @@ If you have Go installed, clone the repo and build it yourself.
 
 There's a lot I want to do:
 
-* Receiver to persist data to disk (with SQLite).
+* Receiver to persist data to database
 * Store historical data for comparison, graphs etc.
 * Choice of HTTP or HTTPS.
 * Create a proper web-app with secure login.
@@ -274,6 +283,7 @@ There's a lot I want to do:
   * Add distro icon
   * Add 'delete' button.
 * Consider using github.com/shirou/gopsutil for OS details.
+* Look into using gRPC / protocol buffers. Unsure if they have any advantage over simple JSON.
 
 ---
 
@@ -282,6 +292,7 @@ There's a lot I want to do:
 * **2021-07-01**, v0.0.1.  Initial release.  Collector registers basic info with the Receiver.
 * **2021-07-xx**, v0.0.2.  Collects more information, but only on Linux.  Change to struct to allow 'meta' data such as app version, errors.  Version check: Receiver will reject data if the Collector is not the same version.
 * **2021-08-02**, v0.0.3.  Bug fixes: using host address, not remote address; hung on failed data send.  Ensured changing data is logged on first attempt: it's anti-DRY, but the web page doesn't look like it's broken now.  Added basic Windows version string.  Tested Collector on many versions of Linux, and Windows 10.  Added CPU count and clock speed.  Added more future to-do's to readme.
+* **2021-08-05**, v0.0.4.  Upgraded to go v1.16.7.  Added operating system images for many systems, to made identification easier (I found out that although they're marketed differently, Lubuntu and Kubuntu identify themselves as Ubuntu, and 'MX' as Debian).  More testing, including Solaris (had to add some 'not yet implemented' checks) requiring new binaries and new build config in the 'build.sh' helper script (only the binaries for Linux are kept in the repo).  Data in the Receiver is persisted to disk at regular intervals and when the program is terminated (additionally created a shutdown handler to achieve this).  Data is then loaded again at startup.
 
 ---
 

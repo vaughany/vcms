@@ -8,13 +8,16 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"runtime"
+	"syscall"
 	"time"
 	"vcms"
 )
 
 //go:embed templates/*.gohtml
 //go:embed assets/img/*.png
+//go:embed assets/img/*.html
 var embeddedFiles embed.FS
 
 const (
@@ -24,12 +27,14 @@ const (
 )
 
 var (
-	debug                 bool   = false
-	conciseDateTimeFormat string = "Mon Jan 2 2006, 15:04"
-	nodes                        = make(map[string]*vcms.SystemData)
-	cmdSubtitleHTML       string
-	cmdFooterHTML         string
-	receiverURL           string = "127.0.0.1:8080" // Don't put e.g. http:// at the start. Add this to docs.
+	debug                         bool   = false
+	conciseDateTimeFormat         string = "Mon Jan 2 2006, 15:04"
+	nodes                                = make(map[string]*vcms.SystemData)
+	cmdSubtitleHTML               string
+	cmdFooterHTML                 string
+	receiverURL                   string = "127.0.0.1:8080" // Don't put e.g. http:// at the start. Add this to docs.
+	persistentStorage             string = "nodes.json"
+	persistentStorageSaveInterval int    = 300 // TODO: make configurable.
 	// logFile  string = vcms.MakeLogName(appCodename)
 )
 
@@ -51,7 +56,8 @@ type rowData struct {
 	FirstSeen      template.HTML
 	LastSeen       template.HTML
 	HostUptime     template.HTML
-	OsVersion      template.HTML
+	OSVersion      template.HTML
+	OSImage        string
 	CPU            template.HTML
 	RebootRequired template.HTML
 	LoadAvgs       template.HTML
@@ -81,6 +87,8 @@ func init() {
 }
 
 func main() {
+	shutdownHandler()
+
 	log.Println(vcms.Version(cmdName))
 	log.Printf("%s \n", cmdDesc)
 	log.Printf("%s \n", vcms.AppDesc)
@@ -89,17 +97,26 @@ func main() {
 		go dumper(nodes)
 	}
 
+	// Load the nodes from a file.
+	loadFromPersistentStorage()
+
+	// Save all the nodes out to a file regularly.
+	go saveToPersistentStorageRegularly()
+
 	// Handle files being served out of ./assets/img folder.
-	// fileServer := http.FileServer(http.Dir("./assets/img/"))
-	// http.Handle("/img/", http.StripPrefix("/img", fileServer))
+	fileServer := http.FileServer(http.Dir("./assets/img/"))
+	http.Handle("/img/", http.StripPrefix("/img", fileServer))
 	// ...or just handle the two files we actually want.
-	http.HandleFunc("/img/logo.png", logoHandler)
-	http.HandleFunc("/img/favicon.png", faviconHandler)
+	// http.HandleFunc("/img/logo.png", logoHandler)
+	// http.HandleFunc("/img/favicon.png", faviconHandler)
 
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/dashboard", dashboardHandler)
 	http.HandleFunc("/api/announce", apiAnnounceHandler)
 	http.HandleFunc("/api/ping", apiPingHandler)
+
+	http.HandleFunc("/save", saveToPersistentStorageHandler)
+	http.HandleFunc("/load", loadFromPersistentStorageHandler)
 
 	log.Printf("Running web server on http://%s.", receiverURL)
 	log.Printf("To connect a Collector, run: './collector -r http://%s'.", receiverURL)
@@ -120,4 +137,19 @@ func dumper(nodes map[string]*vcms.SystemData) {
 		}
 		time.Sleep(time.Second * time.Duration(10))
 	}
+}
+
+func shutdownHandler() {
+	channel := make(chan os.Signal)
+	signal.Notify(channel, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-channel
+		log.Println("Close signal detected. Saving nodes to persistent storage.")
+
+		saveToPersistentStorage()
+		// TODO: e.g. notify Slack, send an email etc.
+
+		log.Println("Exiting.")
+		os.Exit(0)
+	}()
 }

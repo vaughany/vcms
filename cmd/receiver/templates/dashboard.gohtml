@@ -8,6 +8,7 @@
       <thead>
         <tr>
           <th>#</th>
+          <th><abbr title="Hover for OS details">OS / Img</abbr></th>
           <!-- <th>User@Hostname</th> -->
           <th>Hostname</th>
           <th>IP Address</th>
@@ -15,9 +16,8 @@
           <th>First Seen</th>
           <th>Last Seen</th>
           <th>Uptime</th>
-          <th>OS</th>
-          <th>CPUs</th>
           <th>Reboot?</th>
+          <th>CPUs</th>
           <th>Load Avgs</th>
           <th>Mem Total</th>
           <th>Mem Free</th>
@@ -31,6 +31,11 @@
 {{ range $index, $element := .Rows }}
         <tr>
           <th>{{ inc $index }}</th>
+          <th>
+            <figure class="image is-48x48">
+              <img src="/img/{{ .OSImage }}.png" title="{{ .OSVersion }}">
+            </figure>
+          </th>
           <!-- <td>{{ if .Username }}{{ .Username }}@{{ end }}{{ .Hostname }}</td> -->
           <td>{{ .Hostname }}{{ if .Errors }}{{ .Errors }}{{ end }}</td>
           <td>{{ .IPAddress }}</td>
@@ -38,9 +43,8 @@
           <td>{{ .FirstSeen }}</td>
           <td>{{ .LastSeen }}</td>
           <td>{{ .HostUptime }}</td>
-          <td>{{ .OsVersion }}</td>
-          <td>{{ .CPU }}</td>
           <td>{{ .RebootRequired }}</td>
+          <td>{{ .CPU }}</td>
           <td>{{ .LoadAvgs }}</td>
           <td>{{ .MemoryTotal }}</td>
           <td>{{ .MemoryFree }}</td>
