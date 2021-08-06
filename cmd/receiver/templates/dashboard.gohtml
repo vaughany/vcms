@@ -25,6 +25,7 @@
           <th>Swap Free</th>
           <th>Disk Total</th>
           <th>Disk Free</th>
+          <th>Manage</th>
         </tr>
       </thead>
       <tbody>
@@ -52,6 +53,7 @@
           <td>{{ .SwapFree }}</td>
           <td>{{ .DiskTotal }}</td>
           <td>{{ .DiskFree }}</td>
+          <td><a href="/node/remove/?node={{ .Hostname }}" onclick="return confirm('Are you sure you want to remove this node?')">remove</a></td>
         </tr>
 {{ end }}
       </tbody>

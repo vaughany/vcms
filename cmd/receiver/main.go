@@ -117,6 +117,7 @@ func main() {
 
 	http.HandleFunc("/save", saveToPersistentStorageHandler)
 	http.HandleFunc("/load", loadFromPersistentStorageHandler)
+	http.HandleFunc("/node/remove/", nodeRemoveHandler) // Note the trailing '/'.
 
 	log.Printf("Running web server on http://%s.", receiverURL)
 	log.Printf("To connect a Collector, run: './collector -r http://%s'.", receiverURL)

@@ -1,6 +1,6 @@
 # VCMS - Vaughany's Computer Monitoring System
 
-![Screenshot of v0.0.4](./screenshots/v0.0.4.png)
+![Screenshot of v0.0.5](./screenshots/v0.0.5.png)
 
 ## What is VCMS?
 
@@ -74,7 +74,7 @@ I aim to test both Receiver and Collector programs on as many OSes and architect
   * 7
   * 8
 * Kali:
-  * ~~Rolling~~
+  * Rolling
 * Solaris:
   * 11
 * ~~BSD~~
@@ -284,6 +284,7 @@ There's a lot I want to do:
   * Add 'delete' button.
 * Consider using github.com/shirou/gopsutil for OS details.
 * Look into using gRPC / protocol buffers. Unsure if they have any advantage over simple JSON.
+* Send a 'pause', 'restart' or 'force send' from the Receiver.
 
 ---
 
@@ -292,7 +293,8 @@ There's a lot I want to do:
 * **2021-07-01**, v0.0.1.  Initial release.  Collector registers basic info with the Receiver.
 * **2021-07-xx**, v0.0.2.  Collects more information, but only on Linux.  Change to struct to allow 'meta' data such as app version, errors.  Version check: Receiver will reject data if the Collector is not the same version.
 * **2021-08-02**, v0.0.3.  Bug fixes: using host address, not remote address; hung on failed data send.  Ensured changing data is logged on first attempt: it's anti-DRY, but the web page doesn't look like it's broken now.  Added basic Windows version string.  Tested Collector on many versions of Linux, and Windows 10.  Added CPU count and clock speed.  Added more future to-do's to readme.
-* **2021-08-05**, v0.0.4.  Upgraded to go v1.16.7.  Added operating system images for many systems, to made identification easier (I found out that although they're marketed differently, Lubuntu and Kubuntu identify themselves as Ubuntu, and 'MX' as Debian).  More testing, including Solaris (had to add some 'not yet implemented' checks) requiring new binaries and new build config in the 'build.sh' helper script (only the binaries for Linux are kept in the repo).  Data in the Receiver is persisted to disk at regular intervals and when the program is terminated (additionally created a shutdown handler to achieve this).  Data is then loaded again at startup.
+* **2021-08-05**, v0.0.4.  Upgraded to Go v1.16.7.  Added operating system images for many systems, to made identification easier (I found out that although they're marketed differently, Lubuntu and Kubuntu identify themselves as Ubuntu, and 'MX' as Debian).  More testing, including Solaris (had to add some 'not yet implemented' checks) requiring new binaries and new build config in the 'build.sh' helper script (only the binaries for Linux are kept in the repo).  Data in the Receiver is persisted to disk at regular intervals and when the program is terminated (additionally created a shutdown handler to achieve this).  Data is then loaded again at startup.
+* **2021-08-06**, v0.0.5.  Added ability to remove a node's data from the Receiver.
 
 ---
 

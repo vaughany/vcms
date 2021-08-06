@@ -154,3 +154,19 @@ func loadFromPersistentStorageHandler(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/dashboard", http.StatusTemporaryRedirect)
 }
+
+func nodeRemoveHandler(w http.ResponseWriter, r *http.Request) {
+	URLNodes, ok := r.URL.Query()["node"]
+	if !ok || len(URLNodes[0]) < 1 {
+		log.Println("URL parameter 'node' is missing.")
+		return
+	}
+	node := URLNodes[0]
+
+	// log.Printf("URL param 'node' is: '%s'.\n", string(node))
+	log.Printf("Removing node '%s'.\n", string(node))
+
+	delete(nodes, node)
+
+	http.Redirect(w, r, "/dashboard", http.StatusTemporaryRedirect)
+}
