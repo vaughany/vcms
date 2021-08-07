@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"time"
+	"vcms"
 )
 
 func saveToPersistentStorage() {
@@ -26,7 +27,12 @@ func loadFromPersistentStorage() {
 }
 
 func saveJSONToFile() {
-	jsonBytes, err := json.Marshal(nodes)
+	newNodes := vcms.SystemDataPlusDateTime{
+		SaveDateTime: time.Now(),
+		SystemData:   nodes,
+	}
+
+	jsonBytes, err := json.Marshal(newNodes)
 	if err != nil {
 		log.Println("JSON data could not be marshalled for some reason, so could not save data.")
 		return
@@ -55,11 +61,13 @@ func loadJSONFromFile() {
 		return
 	}
 
-	err = json.Unmarshal(jsonBytes, &nodes)
+	newNodes := vcms.SystemDataPlusDateTime{}
+	err = json.Unmarshal(jsonBytes, &newNodes)
 	if err != nil {
 		log.Printf("JSON data from %s was loaded but could not be understood.\n", persistentStorage)
 		return
 	}
 
+	nodes = newNodes.SystemData
 	log.Printf("Loading nodes as JSON: read %d bytes from %s.\n", len(jsonBytes), persistentStorage)
 }

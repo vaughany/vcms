@@ -14,8 +14,8 @@ AppXxx stores strings common to both the Collector and Receiver.
 ProjectURL is the URL of the project on GitHub.
 */
 const (
-	AppDate    string = "2021-08-06"
-	AppVersion string = "0.0.5"
+	AppDate    string = "2021-08-07"
+	AppVersion string = "0.0.6"
 	AppTitle   string = "Vaughany's Computer Monitoring System"
 	ProjectURL string = "github.com/vaughany/vcms"
 	AppDesc    string = "Description of the whole system goes here."
@@ -48,6 +48,14 @@ type SystemData struct {
 	CPUCount       int       `json:"cpu_count"`
 	CPUSpeed       string    `json:"cpu_speed"`
 	// UpdateRequired bool     `json:"update_required"`
+}
+
+/*
+SystemDataPlusDateTime represents SystemData and a timestamp - used for file-persisted data.
+*/
+type SystemDataPlusDateTime struct {
+	SaveDateTime time.Time              `json:"save_datetime"`
+	SystemData   map[string]*SystemData `json:"system_data"`
 }
 
 /*

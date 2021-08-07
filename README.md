@@ -295,6 +295,7 @@ There's a lot I want to do:
 * **2021-08-02**, v0.0.3.  Bug fixes: using host address, not remote address; hung on failed data send.  Ensured changing data is logged on first attempt: it's anti-DRY, but the web page doesn't look like it's broken now.  Added basic Windows version string.  Tested Collector on many versions of Linux, and Windows 10.  Added CPU count and clock speed.  Added more future to-do's to readme.
 * **2021-08-05**, v0.0.4.  Upgraded to Go v1.16.7.  Added operating system images for many systems, to made identification easier (I found out that although they're marketed differently, Lubuntu and Kubuntu identify themselves as Ubuntu, and 'MX' as Debian).  More testing, including Solaris (had to add some 'not yet implemented' checks) requiring new binaries and new build config in the 'build.sh' helper script (only the binaries for Linux are kept in the repo).  Data in the Receiver is persisted to disk at regular intervals and when the program is terminated (additionally created a shutdown handler to achieve this).  Data is then loaded again at startup.
 * **2021-08-06**, v0.0.5.  Added ability to remove a node's data from the Receiver.
+* **2021-08-07**, v0.0.6.  Added timestamp to the disk-persisted data; added macOS to build file.
 
 ---
 
