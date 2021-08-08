@@ -92,3 +92,22 @@ func apiPingHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, result)
 	log.Println("Received ping. Returned " + result)
 }
+
+func exportJSONHandler(w http.ResponseWriter, r *http.Request) {
+	newNodes := vcms.SystemDataPlusDateTime{
+		SaveDateTime: time.Now(),
+		SystemData:   nodes,
+	}
+
+	jsonBytes, err := json.Marshal(newNodes)
+	if err != nil {
+		log.Println("JSON data could not be marshalled for some reason, so could not export data.")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "%s", jsonBytes)
+
+	log.Println("Exporting nodes as JSON.")
+}

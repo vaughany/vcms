@@ -14,8 +14,8 @@ AppXxx stores strings common to both the Collector and Receiver.
 ProjectURL is the URL of the project on GitHub.
 */
 const (
-	AppDate    string = "2021-08-07"
-	AppVersion string = "0.0.6"
+	AppDate    string = "2021-08-08"
+	AppVersion string = "0.0.7"
 	AppTitle   string = "Vaughany's Computer Monitoring System"
 	ProjectURL string = "github.com/vaughany/vcms"
 	AppDesc    string = "Description of the whole system goes here."

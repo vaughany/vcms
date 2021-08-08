@@ -119,6 +119,8 @@ func main() {
 	http.HandleFunc("/load", loadFromPersistentStorageHandler)
 	http.HandleFunc("/node/remove/", nodeRemoveHandler) // Note the trailing '/'.
 
+	http.HandleFunc("/export/json", exportJSONHandler)
+
 	log.Printf("Running web server on http://%s.", receiverURL)
 	log.Printf("To connect a Collector, run: './collector -r http://%s'.", receiverURL)
 	log.Fatal(http.ListenAndServe(receiverURL, nil))
