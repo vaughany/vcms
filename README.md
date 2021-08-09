@@ -4,7 +4,7 @@
 
 ## What is VCMS?
 
-> **tl;dr:**  VCMS is a work-in-progress cross-platform zero-config multi-computer health monitoring tool, and is a side-project I am working on to learn [Go](https://golang.org/).  Be kind!
+> **tl;dr:**  VCMS is a work-in-progress cross-platform zero-config computer health monitoring tool (for many computers to report their status to a central point) and is a side-project I am working on to learn [Go](https://golang.org/).  Be kind!
 
 I've used [Munin](https://munin-monitoring.org/) for years and [M/Monit](https://mmonit.com/) a lot also.  Both are excellet montoring solutions.  I wanted to try my hand at something similar, as a learning exercise.  *This project doesn't (yet) do anything that Munin or M/Monit don't already do,* but the upside is that it's really, really simple.
 
