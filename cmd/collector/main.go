@@ -22,21 +22,20 @@ import (
 	"vcms"
 )
 
-const (
-	cmdName     string = "VCMS - Collector"
-	cmdDesc     string = "Collects information about the computer, and sends it to the Receiver app."
-	cmdCodename string = "vcms-collector"
-)
+func main() {
+	const (
+		cmdName     string = "VCMS - Collector"
+		cmdDesc     string = "Collects information about the computer, and sends it to the Receiver app."
+		cmdCodename string = "vcms-collector"
+	)
 
-var (
-	debug       bool      = false
-	testing     bool      = false
-	version     bool      = false
-	receiverURL string    = "http://127.0.0.1:8080"
-	startTime   time.Time = time.Now()
-)
+	var (
+		version     bool   = false
+		debug       bool   = false
+		testing     bool   = false
+		receiverURL string = "http://127.0.0.1:8080"
+	)
 
-func init() {
 	flag.BoolVar(&debug, "d", debug, "Shows debugging info")
 	flag.BoolVar(&testing, "t", testing, "Creates a random hostname, username and IP address")
 	flag.StringVar(&receiverURL, "r", receiverURL, "URL of the 'Receiver' application")
@@ -47,9 +46,7 @@ func init() {
 		fmt.Println(vcms.Version(cmdName))
 		os.Exit(0)
 	}
-}
 
-func main() {
 	log.Println(vcms.Version(cmdName))
 	log.Printf("%s \n", cmdDesc)
 	log.Printf("%s \n", vcms.AppDesc)
@@ -57,13 +54,14 @@ func main() {
 	var wg sync.WaitGroup
 
 	wg.Add(1)
-	go sendAnnounce()
+	go sendAnnounce(debug, testing, receiverURL)
 	wg.Wait()
 }
 
-func sendAnnounce() {
+func sendAnnounce(debug bool, testing bool, receiverURL string) {
 	var (
-		watchDelay         int = 10
+		watchDelay         int       = 10
+		startTime          time.Time = time.Now()
 		lastSuccessfulSend time.Time
 	)
 
@@ -93,7 +91,7 @@ func sendAnnounce() {
 		data.DiskFree = diskDetails[1]
 		data.LoadAvgs = getLoadAvgs()
 		data.Meta.AppVersion = vcms.AppVersion
-		data.Meta.AppUptime = getAppUptime()
+		data.Meta.AppUptime = getAppUptime(startTime)
 		data.Meta.Errors = errors
 
 		// Adjust some of the core data if we're testing.
@@ -360,7 +358,7 @@ func printLastSuccessfulSend(t time.Time) {
 	}
 }
 
-func getAppUptime() string {
+func getAppUptime(startTime time.Time) string {
 	return time.Since(startTime).Round(time.Second).String()
 }
 

@@ -20,19 +20,14 @@ import (
 //go:embed assets/img/*.html
 var embeddedFiles embed.FS
 
-const (
-	cmdName     string = "VCMS - Receiver"
-	cmdDesc     string = "Receives data from the Collector apps, creates a web page."
-	cmdCodename string = "vcms-receiver"
-)
-
+// Something like this, to ditch global state?
+//   https://stackoverflow.com/a/46517000/254146
 var (
 	debug                         bool   = false
 	conciseDateTimeFormat         string = "Mon Jan 2 2006, 15:04"
 	nodes                                = make(map[string]*vcms.SystemData)
 	cmdSubtitleHTML               string
 	cmdFooterHTML                 string
-	receiverURL                   string = "127.0.0.1:8080" // Don't put e.g. http:// at the start. Add this to docs.
 	persistentStorage             string = "nodes.json"
 	persistentStorageSaveInterval int    = 300 // TODO: make configurable.
 	// logFile  string = vcms.MakeLogName(appCodename)
@@ -69,8 +64,17 @@ type rowData struct {
 	DiskFree       template.HTML
 }
 
-func init() {
-	var version bool = false
+func main() {
+	const (
+		cmdName     string = "VCMS - Receiver"
+		cmdDesc     string = "Receives data from the Collector apps, creates a web page."
+		cmdCodename string = "vcms-receiver"
+	)
+
+	var (
+		version     bool   = false
+		receiverURL string = "127.0.0.1:8080" // Don't put e.g. http:// at the start. Add this to docs.
+	)
 
 	cmdSubtitleHTML = fmt.Sprintf("See <a href=\"https://%s\" target=\"_blank\">%s</a> for more info.", vcms.ProjectURL, vcms.ProjectURL)
 	cmdFooterHTML = fmt.Sprintf("<strong>%s</strong> v%s (%s), built with %s, %s/%s. %s", vcms.AppTitle, vcms.AppVersion, vcms.AppDate, runtime.Version(), runtime.GOOS, runtime.GOARCH, cmdSubtitleHTML)
@@ -84,9 +88,7 @@ func init() {
 		fmt.Println(vcms.Version(cmdName))
 		os.Exit(0)
 	}
-}
 
-func main() {
 	shutdownHandler()
 
 	log.Println(vcms.Version(cmdName))
