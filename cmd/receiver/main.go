@@ -144,6 +144,7 @@ func dumper(nodes map[string]*vcms.SystemData) {
 	}
 }
 
+// https://stackoverflow.com/a/12571099/254146
 func shutdownHandler() {
 	channel := make(chan os.Signal)
 	signal.Notify(channel, os.Interrupt, syscall.SIGTERM)
