@@ -112,6 +112,8 @@ func getOSImage(node *vcms.SystemData) string {
 		return "centos"
 	case strings.Contains(input, "debian"):
 		return "debian"
+	case strings.Contains(input, "elementary"):
+		return "elementary"
 	case strings.Contains(input, "fedora"):
 		return "fedora"
 	case strings.Contains(input, "kali"):
