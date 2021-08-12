@@ -1,0 +1,51 @@
+project_name: vcms
+env_files:
+  github_token: ./.github_token
+before:
+  hooks:
+    - go mod tidy
+    # - go generate ./...
+builds:
+  - main: ./cmd/collector
+    id: "collector"
+    binary: collector
+    goos:
+      - linux
+      - solaris
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+      - 386
+  - main: ./cmd/receiver
+    id: "receiver"
+    binary: receiver
+    goos:
+      - linux
+      - solaris
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+      - 386
+archives:
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+checksum:
+  name_template: 'checksums.txt'
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+release:
+  github:
+    owner: vaughany
+    name: vcms

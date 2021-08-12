@@ -1,3 +1,5 @@
 bin/*
-README.pdf
+*.pdf
 nodes.json
+dist/
+.github_token
