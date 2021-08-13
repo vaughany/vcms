@@ -1,0 +1,29 @@
+ignoreGeneratedHeader = false
+severity = "warning"
+confidence = 0.3
+errorCode = 0
+warningCode = 0
+
+enableAllRules = true
+
+[rule.file-header]
+    Disabled = true
+#    Arguments = ["This is a header."]
+[rule.function-length]
+#    Disabled = true
+    Arguments = [10, 20]
+[rule.line-length-limit]
+    Disabled = true
+[rule.max-public-structs]
+    Disabled = true
+[rule.nested-structs]
+    Disabled = true
+
+[rule.argument-limit]
+    Arguments = [5]
+[rule.cognitive-complexity]
+    Arguments = [7]
+[rule.cyclomatic]
+    arguments = [10]
+[rule.function-result-limit]
+    Arguments = [2]
