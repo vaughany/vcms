@@ -1,3 +1,4 @@
+// Package Collector collects information about the computer, and sends it to the Receiver app.
 package main
 
 import (
@@ -17,7 +18,6 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 	"vcms"
 )
@@ -30,10 +30,10 @@ func main() {
 	)
 
 	var (
-		version     bool   = false
-		debug       bool   = false
-		testing     bool   = false
-		receiverURL string = "http://127.0.0.1:8080"
+		version     = false
+		debug       = false
+		testing     = false
+		receiverURL = "http://127.0.0.1:8080"
 	)
 
 	flag.BoolVar(&debug, "d", debug, "Shows debugging info")
@@ -51,17 +51,13 @@ func main() {
 	log.Printf("%s \n", cmdDesc)
 	log.Printf("%s \n", vcms.AppDesc)
 
-	var wg sync.WaitGroup
-
-	wg.Add(1)
-	go sendAnnounce(debug, testing, receiverURL)
-	wg.Wait()
+	sendAnnounce(debug, testing, receiverURL)
 }
 
 func sendAnnounce(debug bool, testing bool, receiverURL string) {
 	var (
-		watchDelay         int       = 10
-		startTime          time.Time = time.Now()
+		watchDelay         = 10
+		startTime          = time.Now()
 		lastSuccessfulSend time.Time
 	)
 

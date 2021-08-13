@@ -1,3 +1,4 @@
+// Package Receiver receives data from the Collector apps, creates a web page.
 package main
 
 import (
@@ -23,13 +24,13 @@ var embeddedFiles embed.FS
 // Something like this, to ditch global state?
 //   https://stackoverflow.com/a/46517000/254146
 var (
-	debug                         bool   = false
-	conciseDateTimeFormat         string = "Mon Jan 2 2006, 15:04"
-	nodes                                = make(map[string]*vcms.SystemData)
+	debug                         = false
+	conciseDateTimeFormat         = "Mon Jan 2 2006, 15:04"
+	nodes                         = make(map[string]*vcms.SystemData)
 	cmdSubtitleHTML               string
 	cmdFooterHTML                 string
-	persistentStorage             string = "nodes.json"
-	persistentStorageSaveInterval int    = 300 // TODO: make configurable.
+	persistentStorage             = "nodes.json"
+	persistentStorageSaveInterval = 300 // TODO: make configurable.
 	// logFile  string = vcms.MakeLogName(appCodename)
 )
 
@@ -72,8 +73,8 @@ func main() {
 	)
 
 	var (
-		version     bool   = false
-		receiverURL string = "127.0.0.1:8080" // Don't put e.g. http:// at the start. Add this to docs.
+		version     = false
+		receiverURL = "127.0.0.1:8080" // Don't put e.g. http:// at the start. Add this to docs.
 	)
 
 	cmdSubtitleHTML = fmt.Sprintf("See <a href=\"https://%s\" target=\"_blank\">%s</a> for more info.", vcms.ProjectURL, vcms.ProjectURL)

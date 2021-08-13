@@ -1,5 +1,4 @@
-// This 'vcms' package contains everything common to both programs. DRY, right?
-
+// Package vcms contains everything common to both programs. DRY, right?
 package vcms
 
 import (
