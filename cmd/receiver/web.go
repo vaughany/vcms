@@ -140,6 +140,8 @@ func getOSImage(node *vcms.SystemData) string {
 		return "ubuntu"
 	case strings.Contains(input, "windows"):
 		return "windows"
+	case strings.Contains(input, "zorin"):
+		return "zorin"
 	default:
 		return "generic"
 	}
