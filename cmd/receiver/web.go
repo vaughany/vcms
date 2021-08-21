@@ -47,8 +47,8 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 		row.Hostname = nodes[key].Hostname
 		row.IPAddress = nodes[key].IPAddress
 		row.Username = nodes[key].Username
-		row.FirstSeen = fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%s ago)</small></span>", nodes[key].FirstSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].FirstSeen).Round(time.Second)))
-		row.LastSeen = fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%s ago)</small></span>", nodes[key].LastSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].LastSeen).Round(time.Second)))
+		row.FirstSeen = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%s ago)</small></span>", nodes[key].FirstSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].FirstSeen).Round(time.Second))))
+		row.LastSeen = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%s ago)</small></span>", nodes[key].LastSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].LastSeen).Round(time.Second))))
 		row.HostUptime = nodes[key].HostUptime
 		row.OSVersion = nodes[key].OSVersion
 		row.CPU = getCPUHTML(nodes[key])
@@ -71,7 +71,7 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 
 		row.DiskTotal = bytefmt.ByteSize(uint64(nodes[key].DiskTotal * bytefmt.KILOBYTE))
 		percentage := float64(nodes[key].DiskFree) / float64(nodes[key].DiskTotal) * 100
-		row.DiskFree = fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%.1f%%)</small></span>", bytefmt.ByteSize(uint64(nodes[key].DiskFree*bytefmt.KILOBYTE)), percentage)
+		row.DiskFree = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%.1f%%)</small></span>", bytefmt.ByteSize(uint64(nodes[key].DiskFree*bytefmt.KILOBYTE)), percentage))
 
 		row.OSImage = getOSImage(nodes[key])
 

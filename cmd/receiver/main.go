@@ -5,6 +5,7 @@ import (
 	"embed"
 	"flag"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -48,8 +49,8 @@ type rowData struct {
 	Errors         string
 	IPAddress      string
 	Username       string
-	FirstSeen      string
-	LastSeen       string
+	FirstSeen      template.HTML
+	LastSeen       template.HTML
 	HostUptime     string
 	OSVersion      string
 	OSImage        string
@@ -61,7 +62,7 @@ type rowData struct {
 	SwapTotal      string
 	SwapFree       string
 	DiskTotal      string
-	DiskFree       string
+	DiskFree       template.HTML
 }
 
 func main() {
