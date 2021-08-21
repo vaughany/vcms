@@ -5,7 +5,6 @@ import (
 	"embed"
 	"flag"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -38,31 +37,31 @@ var (
 HTMLData represents the data sent to the HTML template.
 */
 type HTMLData struct {
-	Title    template.HTML
-	Subtitle template.HTML
-	Footer   template.HTML
+	Title    string
+	Subtitle string
+	Footer   string
 	Rows     []rowData
 }
 
 type rowData struct {
-	Hostname       template.HTML
-	Errors         template.HTML
-	IPAddress      template.HTML
-	Username       template.HTML
-	FirstSeen      template.HTML
-	LastSeen       template.HTML
-	HostUptime     template.HTML
-	OSVersion      template.HTML
+	Hostname       string
+	Errors         string
+	IPAddress      string
+	Username       string
+	FirstSeen      string
+	LastSeen       string
+	HostUptime     string
+	OSVersion      string
 	OSImage        string
-	CPU            template.HTML
-	RebootRequired template.HTML
-	LoadAvgs       template.HTML
-	MemoryTotal    template.HTML
-	MemoryFree     template.HTML
-	SwapTotal      template.HTML
-	SwapFree       template.HTML
-	DiskTotal      template.HTML
-	DiskFree       template.HTML
+	CPU            string
+	RebootRequired string
+	LoadAvgs       string
+	MemoryTotal    string
+	MemoryFree     string
+	SwapTotal      string
+	SwapFree       string
+	DiskTotal      string
+	DiskFree       string
 }
 
 func main() {

@@ -36,42 +36,42 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 	sort.Strings(keys)
 
 	// Build the HTML.
-	data.Title = template.HTML(vcms.AppTitle)
-	// data.Subtitle = template.HTML("Something Something Darkside")
-	data.Footer = template.HTML(cmdFooterHTML)
+	data.Title = vcms.AppTitle
+	// data.Subtitle = "Something Something Darkside"
+	data.Footer = cmdFooterHTML
 	for _, key := range keys {
 		var row rowData
 		if len(nodes[key].Meta.Errors) > 0 {
-			row.Errors = template.HTML(fmt.Sprintf(" <span style=\"color: red;\" title=\"%s\">ERROR!</span>", strings.Join(nodes[key].Meta.Errors, "\n")))
+			row.Errors = fmt.Sprintf(" <span style=\"color: red;\" title=\"%s\">ERROR!</span>", strings.Join(nodes[key].Meta.Errors, "\n"))
 		}
-		row.Hostname = template.HTML(nodes[key].Hostname)
-		row.IPAddress = template.HTML(nodes[key].IPAddress)
-		row.Username = template.HTML(nodes[key].Username)
-		row.FirstSeen = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%s ago)</small></span>", nodes[key].FirstSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].FirstSeen).Round(time.Second))))
-		row.LastSeen = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%s ago)</small></span>", nodes[key].LastSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].LastSeen).Round(time.Second))))
-		row.HostUptime = template.HTML(nodes[key].HostUptime)
-		row.OSVersion = template.HTML(nodes[key].OSVersion)
+		row.Hostname = nodes[key].Hostname
+		row.IPAddress = nodes[key].IPAddress
+		row.Username = nodes[key].Username
+		row.FirstSeen = fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%s ago)</small></span>", nodes[key].FirstSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].FirstSeen).Round(time.Second)))
+		row.LastSeen = fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%s ago)</small></span>", nodes[key].LastSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].LastSeen).Round(time.Second)))
+		row.HostUptime = nodes[key].HostUptime
+		row.OSVersion = nodes[key].OSVersion
 		row.CPU = getCPUHTML(nodes[key])
 		if nodes[key].RebootRequired {
-			row.RebootRequired = template.HTML("yes")
+			row.RebootRequired = "yes"
 		} else {
-			row.RebootRequired = template.HTML("no")
+			row.RebootRequired = "no"
 		}
 
 		loadAvgsString := []string{}
 		for _, loadAvg := range nodes[key].LoadAvgs {
 			loadAvgsString = append(loadAvgsString, fmt.Sprintf("%.2f", loadAvg))
 		}
-		row.LoadAvgs = template.HTML(strings.Join(loadAvgsString, " "))
+		row.LoadAvgs = strings.Join(loadAvgsString, " ")
 
-		row.MemoryTotal = template.HTML(bytefmt.ByteSize(uint64(nodes[key].MemoryTotal * bytefmt.KILOBYTE)))
-		row.MemoryFree = template.HTML(bytefmt.ByteSize(uint64(nodes[key].MemoryFree * bytefmt.KILOBYTE)))
-		row.SwapTotal = template.HTML(bytefmt.ByteSize(uint64(nodes[key].SwapTotal * bytefmt.KILOBYTE)))
-		row.SwapFree = template.HTML(bytefmt.ByteSize(uint64(nodes[key].SwapFree * bytefmt.KILOBYTE)))
+		row.MemoryTotal = bytefmt.ByteSize(uint64(nodes[key].MemoryTotal * bytefmt.KILOBYTE))
+		row.MemoryFree = bytefmt.ByteSize(uint64(nodes[key].MemoryFree * bytefmt.KILOBYTE))
+		row.SwapTotal = bytefmt.ByteSize(uint64(nodes[key].SwapTotal * bytefmt.KILOBYTE))
+		row.SwapFree = bytefmt.ByteSize(uint64(nodes[key].SwapFree * bytefmt.KILOBYTE))
 
-		row.DiskTotal = template.HTML(bytefmt.ByteSize(uint64(nodes[key].DiskTotal * bytefmt.KILOBYTE)))
+		row.DiskTotal = bytefmt.ByteSize(uint64(nodes[key].DiskTotal * bytefmt.KILOBYTE))
 		percentage := float64(nodes[key].DiskFree) / float64(nodes[key].DiskTotal) * 100
-		row.DiskFree = template.HTML(template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%.1f%%)</small></span>", bytefmt.ByteSize(uint64(nodes[key].DiskFree*bytefmt.KILOBYTE)), percentage)))
+		row.DiskFree = fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%.1f%%)</small></span>", bytefmt.ByteSize(uint64(nodes[key].DiskFree*bytefmt.KILOBYTE)), percentage)
 
 		row.OSImage = getOSImage(nodes[key])
 
@@ -95,12 +95,12 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 // 	http.ServeFile(w, r, "./assets/img/favicon.png")
 // }
 
-func getCPUHTML(node *vcms.SystemData) template.HTML {
+func getCPUHTML(node *vcms.SystemData) string {
 	if node.CPUCount == 0 {
-		return template.HTML("-")
+		return "-"
 	}
 
-	return template.HTML(fmt.Sprintf("%d, %s", node.CPUCount, node.CPUSpeed))
+	return fmt.Sprintf("%d, %s", node.CPUCount, node.CPUSpeed)
 }
 
 func getOSImage(node *vcms.SystemData) string {
