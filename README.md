@@ -2,6 +2,9 @@
 
 ![Screenshot of v0.0.5](./screenshots/v0.0.5.png)
 
+[![Go Report Card](https://goreportcard.com/badge/vaughany/vcms)](https://goreportcard.com/report/vaughany/vcms)
+[![codecov](https://codecov.io/gh/vaughany/vcms/branch/main/graph/badge.svg?token=RC1PUVBO78)](https://codecov.io/gh/vaughany/vcms)
+
 ## What is VCMS?
 
 > **tl;dr:**  VCMS is a work-in-progress cross-platform zero-config computer health monitoring tool (for many computers to report their status to a central point) and is a side-project I am working on to learn [Go](https://golang.org/).  Be kind!
@@ -70,14 +73,21 @@ I aim to test both Receiver and Collector programs on as many OSes and architect
 * Fedora:
   * 34 (Cloud Edition)
   * 33 (Cloud Edition)
+* Elementary
+  * 6 / Odin
+* Manjaro
 * Oracle:
   * 7
   * 8
 * Kali:
   * Rolling
+* Zorin
 * Solaris:
   * 11
-* ~~BSD~~
+* BSD:
+  * ~~FreeBSD~~
+  * ~~OpenBSD~~
+* ~~Plan 9~~
 * ~~IBM OS / 2~~
 * ~~macOS~~
 * Windows:
