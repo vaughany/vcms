@@ -112,7 +112,7 @@ func sendAnnounce(debug bool, testing bool, receiverURL string) {
 		response, err := http.Post(sendURL, "application/json", bytes.NewBuffer(jsonBytes))
 		if err != nil {
 			log.Print(err)
-			printLastSuccessfulSend(lastSuccessfulSend)
+			log.Print(getLastSuccessfulSend(lastSuccessfulSend))
 		} else {
 			log.Printf("Response: %s", response.Status)
 			if response.StatusCode == 200 {
@@ -120,7 +120,7 @@ func sendAnnounce(debug bool, testing bool, receiverURL string) {
 			} else {
 				body, _ := io.ReadAll(response.Body)
 				log.Print(string(body))
-				printLastSuccessfulSend(lastSuccessfulSend)
+				log.Print(getLastSuccessfulSend(lastSuccessfulSend))
 			}
 		}
 
@@ -274,14 +274,14 @@ func getRebootRequired() bool {
 	return true
 }
 
-func getMemoryDetails() []int {
+func getMemoryDetails() [4]int {
 	if runtime.GOOS == "windows" {
 		log.Println("WARNING: 'getMemoryDetails()' function not yet implemented for Windows.")
-		return []int{0, 0, 0, 0}
+		return [4]int{0, 0, 0, 0}
 	}
 	if runtime.GOOS == "solaris" {
 		log.Println("WARNING: 'getMemoryDetails()' function not yet implemented for Solaris.")
-		return []int{0, 0, 0, 0}
+		return [4]int{0, 0, 0, 0}
 	}
 
 	memory, err := os.ReadFile("/proc/meminfo")
@@ -300,13 +300,13 @@ func getMemoryDetails() []int {
 	swapTotal, _ := strconv.Atoi(regexSwapTotal.FindStringSubmatch(string(memory))[1])
 	swapFree, _ := strconv.Atoi(regexSwapFree.FindStringSubmatch(string(memory))[1])
 
-	return []int{memTotal, memFree, swapTotal, swapFree}
+	return [4]int{memTotal, memFree, swapTotal, swapFree}
 }
 
-func getDiskDetails() []int {
+func getDiskDetails() [2]int {
 	if runtime.GOOS == "windows" {
 		log.Println("WARNING: 'getDiskDetails()' function not yet implemented for Windows.")
-		return []int{0, 0}
+		return [2]int{0, 0}
 	}
 
 	disk, err := exec.Command("df", "-k", "/").Output()
@@ -319,17 +319,17 @@ func getDiskDetails() []int {
 	diskTotal, _ := strconv.Atoi(regexDisk.FindStringSubmatch(string(disk))[1])
 	diskFree, _ := strconv.Atoi(regexDisk.FindStringSubmatch(string(disk))[3])
 
-	return []int{diskTotal, diskFree}
+	return [2]int{diskTotal, diskFree}
 }
 
-func getLoadAvgs() []float64 {
+func getLoadAvgs() [3]float64 {
 	if runtime.GOOS == "windows" {
 		log.Println("WARNING: 'getLoadAvgs()' function not yet implemented for Windows.")
-		return []float64{0, 0, 0}
+		return [3]float64{0, 0, 0}
 	}
 	if runtime.GOOS == "solaris" {
 		log.Println("WARNING: 'getLoadAvgs()' function not yet implemented for Solaris.")
-		return []float64{0, 0, 0}
+		return [3]float64{0, 0, 0}
 	}
 
 	load, err := os.ReadFile("/proc/loadavg")
@@ -342,15 +342,15 @@ func getLoadAvgs() []float64 {
 	five, _ := strconv.ParseFloat(loads[1], 64)
 	fifteen, _ := strconv.ParseFloat(loads[2], 64)
 
-	return []float64{one, five, fifteen}
+	return [3]float64{one, five, fifteen}
 }
 
-func printLastSuccessfulSend(t time.Time) {
+func getLastSuccessfulSend(t time.Time) string {
 	msg := "Last successful data send:"
 	if t.IsZero() {
-		log.Printf("%s Never.\n", msg)
+		return fmt.Sprintf("%s Never.\n", msg)
 	} else {
-		log.Printf("%s %s (%s ago)\n", msg, t.Format(time.RFC1123Z), time.Since(t).Round(time.Second))
+		return fmt.Sprintf("%s %s (%s ago)\n", msg, t.Format(time.RFC1123Z), time.Since(t).Round(time.Second))
 	}
 }
 

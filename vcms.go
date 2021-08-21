@@ -3,7 +3,6 @@ package vcms
 
 import (
 	"fmt"
-	"log"
 	"runtime"
 	"time"
 )
@@ -29,23 +28,23 @@ type SystemData struct {
 		AppUptime  string   `json:"app_uptime"`
 		Errors     []string `json:"errors"`
 	} `json:"meta"`
-	Hostname       string    `json:"hostname"`
-	IPAddress      string    `json:"ip_address"`
-	Username       string    `json:"username"`
-	FirstSeen      time.Time `json:"first_seen"`
-	LastSeen       time.Time `json:"last_seen"`
-	HostUptime     string    `json:"host_uptime"`
-	OSVersion      string    `json:"os_version"`
-	RebootRequired bool      `json:"reboot_required"`
-	MemoryTotal    int       `json:"memory_total"`
-	MemoryFree     int       `json:"memory_free"`
-	SwapTotal      int       `json:"swap_total"`
-	SwapFree       int       `json:"swap_free"`
-	DiskTotal      int       `json:"disk_total"`
-	DiskFree       int       `json:"disk_free"`
-	LoadAvgs       []float64 `json:"load_avgs"`
-	CPUCount       int       `json:"cpu_count"`
-	CPUSpeed       string    `json:"cpu_speed"`
+	Hostname       string     `json:"hostname"`
+	IPAddress      string     `json:"ip_address"`
+	Username       string     `json:"username"`
+	FirstSeen      time.Time  `json:"first_seen"`
+	LastSeen       time.Time  `json:"last_seen"`
+	HostUptime     string     `json:"host_uptime"`
+	OSVersion      string     `json:"os_version"`
+	RebootRequired bool       `json:"reboot_required"`
+	MemoryTotal    int        `json:"memory_total"`
+	MemoryFree     int        `json:"memory_free"`
+	SwapTotal      int        `json:"swap_total"`
+	SwapFree       int        `json:"swap_free"`
+	DiskTotal      int        `json:"disk_total"`
+	DiskFree       int        `json:"disk_free"`
+	LoadAvgs       [3]float64 `json:"load_avgs"`
+	CPUCount       int        `json:"cpu_count"`
+	CPUSpeed       string     `json:"cpu_speed"`
 	// UpdateRequired bool     `json:"update_required"`
 }
 
@@ -60,17 +59,17 @@ type SystemDataPlusDateTime struct {
 /*
 CheckPopulatedValues checks each item in the SystemData struct for emptiness.
 */
-func (s SystemData) CheckPopulatedValues() bool {
-	switch {
-	case len(s.Hostname) == 0:
-		log.Panic("hostname is empty")
-		return false
-	case len(s.IPAddress) == 0:
-		log.Panic("IP address is empty.")
-		return false
-	}
-	return true
-}
+// func (s SystemData) CheckPopulatedValues() bool {
+// 	switch {
+// 	case len(s.Hostname) == 0:
+// 		log.Panic("hostname is empty")
+// 		return false
+// 	case len(s.IPAddress) == 0:
+// 		log.Panic("IP address is empty.")
+// 		return false
+// 	}
+// 	return true
+// }
 
 /*
 Version formats and prints to the log the version details of the application, then quits.
