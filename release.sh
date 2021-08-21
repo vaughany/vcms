@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Test it.
+# goreleaser build --skip-validate --rm-dist
 # goreleaser release --snapshot --skip-publish --rm-dist
 
 # Release it.
