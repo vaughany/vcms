@@ -40,7 +40,7 @@ HTMLData represents the data sent to the HTML template.
 type HTMLData struct {
 	Title    string
 	Subtitle string
-	Footer   string
+	Footer   template.HTML
 	Rows     []rowData
 }
 

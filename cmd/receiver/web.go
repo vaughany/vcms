@@ -38,7 +38,7 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 	// Build the HTML.
 	data.Title = vcms.AppTitle
 	// data.Subtitle = "Something Something Darkside"
-	data.Footer = cmdFooterHTML
+	data.Footer = template.HTML(cmdFooterHTML)
 	for _, key := range keys {
 		var row rowData
 		if len(nodes[key].Meta.Errors) > 0 {
