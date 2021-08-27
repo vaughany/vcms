@@ -13,7 +13,7 @@ import (
 	"runtime"
 	"syscall"
 	"time"
-	"vcms"
+	vcms "vcms/internal"
 )
 
 //go:embed templates/*.gohtml

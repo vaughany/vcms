@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 	"time"
-	"vcms"
+	vcms "vcms/internal"
 )
 
 func apiAnnounceHandler(w http.ResponseWriter, r *http.Request) {

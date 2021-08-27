@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 	"time"
-	"vcms"
+	vcms "vcms/internal"
 
 	"code.cloudfoundry.org/bytefmt"
 	"github.com/hako/durafmt"

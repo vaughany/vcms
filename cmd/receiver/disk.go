@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 	"time"
-	"vcms"
+	vcms "vcms/internal"
 )
 
 func saveToPersistentStorage() {

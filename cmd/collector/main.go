@@ -19,7 +19,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"vcms"
+	vcms "vcms/internal"
 )
 
 func main() {
