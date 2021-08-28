@@ -97,11 +97,8 @@ I aim to test both Receiver and Collector programs on as many OSes and architect
 
 ## Basic Linux Installation
 
-1. Download the binaries ([from here](https://github.com/vaughany/vcms/tree/main/bin)).  They're not large.  You'll need both the Collector and Receiver for your platform.
+1. Download the binaries ([from here](https://github.com/vaughany/vcms/releases)).  They're not large.  You'll need both the Collector and Receiver for your platform.
 
-   * Ubuntu [Collector](https://github.com/vaughany/vcms/raw/main/bin/collector) and [Receiver](https://github.com/vaughany/vcms/raw/main/bin/receiver)
-   * ~~Windows Collector and Receiver~~
-   
 2. Open two terminals, `cd` to the download location in each.
 
 3. Run the Receiver in one terminal:
@@ -115,9 +112,12 @@ I aim to test both Receiver and Collector programs on as many OSes and architect
    You should see output similar to the following:
 
    ```
-   VCMS - Receiver v0.0.1 (2021-07-01), go1.16.5.
-   Receives data from the Collector apps, creates a web page. 
+   VCMS - Receiver v0.0.7 (2021-08-08), go1.17.
+   Receives data from the Collector apps, creates a web page.
+   Loading nodes from persistent storage.
+   nodes.json could not be read, so could not load node data.
    Running web server on http://127.0.0.1:8080.
+   To connect a Collector, run: './collector -r http://127.0.0.1:8080'.
    ```
 
 4. Run the Collector in the other terminal:
@@ -128,12 +128,11 @@ I aim to test both Receiver and Collector programs on as many OSes and architect
    > 
    > `chmod +x collector`
 
-
    You should see output similar to the following:
 
    ```
-   VCMS - Collector v0.0.1 (2021-07-01), go1.16.5.
-   Collects information about the computer, and sends it to the Receiver app. 
+   VCMS - Collector v0.0.7 (2021-08-08), go1.17.
+   Collects information about the computer, and sends it to the Receiver app.
    Sending data to http://127.0.0.1:8080/api/announce
    Response: 200 OK
    ```
