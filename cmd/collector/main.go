@@ -190,12 +190,8 @@ func getUsername() string {
 }
 
 func getHostUptime() string {
-	if runtime.GOOS == "windows" {
-		log.Println("WARNING: 'getHostUptime()' function not yet implemented for Windows.")
-		return ""
-	}
-	if runtime.GOOS == "solaris" {
-		log.Println("WARNING: 'getHostUptime()' function not yet implemented for Solaris.")
+	if runtime.GOOS == "windows" || runtime.GOOS == "freebsd" {
+		log.Printf("WARNING: 'getHostUptime()' function not yet implemented for %s.", strings.Title(runtime.GOOS))
 		return ""
 	}
 
@@ -234,7 +230,7 @@ func getOSVersion() string {
 		}
 		return str
 
-	case "linux":
+	case "linux", "freebsd":
 		release, err := os.ReadFile("/etc/os-release")
 		if err != nil {
 			log.Panic(err)
@@ -263,7 +259,7 @@ func getOSVersion() string {
 
 func getRebootRequired() bool {
 	if runtime.GOOS == "windows" {
-		log.Println("WARNING: 'getRebootRequired()' function not yet implemented for Windows.")
+		log.Printf("WARNING: 'getRebootRequired()' function not yet implemented for %s.\n", strings.Title(runtime.GOOS))
 		return false
 	}
 
@@ -275,12 +271,8 @@ func getRebootRequired() bool {
 }
 
 func getMemoryDetails() [4]int {
-	if runtime.GOOS == "windows" {
-		log.Println("WARNING: 'getMemoryDetails()' function not yet implemented for Windows.")
-		return [4]int{0, 0, 0, 0}
-	}
-	if runtime.GOOS == "solaris" {
-		log.Println("WARNING: 'getMemoryDetails()' function not yet implemented for Solaris.")
+	if runtime.GOOS == "windows" || runtime.GOOS == "solaris" || runtime.GOOS == "freebsd" {
+		log.Printf("WARNING: 'getMemoryDetails()' function not yet implemented for %s.\n", strings.Title(runtime.GOOS))
 		return [4]int{0, 0, 0, 0}
 	}
 
@@ -305,7 +297,7 @@ func getMemoryDetails() [4]int {
 
 func getDiskDetails() [2]int {
 	if runtime.GOOS == "windows" {
-		log.Println("WARNING: 'getDiskDetails()' function not yet implemented for Windows.")
+		log.Printf("WARNING: 'getDiskDetails()' function not yet implemented for %s.", strings.Title(runtime.GOOS))
 		return [2]int{0, 0}
 	}
 
@@ -323,12 +315,8 @@ func getDiskDetails() [2]int {
 }
 
 func getLoadAvgs() [3]float64 {
-	if runtime.GOOS == "windows" {
-		log.Println("WARNING: 'getLoadAvgs()' function not yet implemented for Windows.")
-		return [3]float64{0, 0, 0}
-	}
-	if runtime.GOOS == "solaris" {
-		log.Println("WARNING: 'getLoadAvgs()' function not yet implemented for Solaris.")
+	if runtime.GOOS == "windows" || runtime.GOOS == "solaris" || runtime.GOOS == "freebsd" {
+		log.Printf("WARNING: 'getLoadAvgs()' function not yet implemented for %s.", strings.Title(runtime.GOOS))
 		return [3]float64{0, 0, 0}
 	}
 
@@ -359,12 +347,8 @@ func getAppUptime(startTime time.Time) string {
 }
 
 func getCPUDetails() (int, string) {
-	if runtime.GOOS == "windows" {
-		log.Println("WARNING: 'getCPUDetails()' function not yet implemented for Windows.")
-		return 0, ""
-	}
-	if runtime.GOOS == "solaris" {
-		log.Println("WARNING: 'getCPUDetails()' function not yet implemented for Solaris.")
+	if runtime.GOOS == "windows" || runtime.GOOS == "solaris" || runtime.GOOS == "freebsd" {
+		log.Printf("WARNING: 'getCPUDetails()' function not yet implemented for %s.\n", strings.Title(runtime.GOOS))
 		return 0, ""
 	}
 
