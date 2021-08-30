@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"runtime"
 	"sort"
 	"strings"
 	"time"
@@ -20,7 +21,11 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func dashboardHandler(w http.ResponseWriter, r *http.Request) {
-	var data HTMLData
+	var (
+		data          HTMLData
+		subFooterHTML = fmt.Sprintf("See <a href=\"https://%s\" target=\"_blank\">%s</a> for more info.", vcms.ProjectURL, vcms.ProjectURL)
+		footerHTML    = fmt.Sprintf("<strong>%s</strong> v%s (%s), built with %s, %s/%s. %s", vcms.AppTitle, vcms.AppVersion, vcms.AppDate, runtime.Version(), runtime.GOOS, runtime.GOARCH, subFooterHTML)
+	)
 
 	funcMap := template.FuncMap{
 		"inc": func(i int) int {
@@ -38,7 +43,7 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 	// Build the HTML.
 	data.Title = vcms.AppTitle
 	// data.Subtitle = "Something Something Darkside"
-	data.Footer = template.HTML(cmdFooterHTML)
+	data.Footer = template.HTML(footerHTML)
 	for _, key := range keys {
 		var row rowData
 		if len(nodes[key].Meta.Errors) > 0 {
@@ -116,6 +121,8 @@ func getOSImage(node *vcms.SystemData) string {
 		return "elementary"
 	case strings.Contains(input, "fedora"):
 		return "fedora"
+	case strings.Contains(input, "freebsd"):
+		return "freebsd"
 	case strings.Contains(input, "kali"):
 		return "kali"
 	// case strings.Contains(input, "kubuntu"): // Kubuntu identifies itself as Ubuntu.
