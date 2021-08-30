@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"runtime"
 	"syscall"
 	"time"
 	vcms "vcms/internal"
@@ -24,14 +23,14 @@ var embeddedFiles embed.FS
 // Something like this, to ditch global state?
 //   https://stackoverflow.com/a/46517000/254146
 var (
-	debug                         = false
-	conciseDateTimeFormat         = "Mon Jan 2 2006, 15:04"
-	nodes                         = make(map[string]*vcms.SystemData)
-	cmdSubtitleHTML               string
-	cmdFooterHTML                 string
-	persistentStorage             = "nodes.json"
-	persistentStorageSaveInterval = 300 // TODO: make configurable.
+	debug = false
+	nodes = make(map[string]*vcms.SystemData)
 	// logFile  string = vcms.MakeLogName(appCodename)
+)
+
+const (
+	conciseDateTimeFormat = "Mon Jan 2 2006, 15:04"
+	persistentStorage     = "nodes.json"
 )
 
 /*
@@ -67,18 +66,16 @@ type rowData struct {
 
 func main() {
 	const (
-		cmdName     string = "VCMS - Receiver"
-		cmdDesc     string = "Receives data from the Collector apps, creates a web page."
-		cmdCodename string = "vcms-receiver"
+		cmdName                       = "VCMS - Receiver"
+		cmdDesc                       = "Receives data from the Collector apps, creates a web page."
+		cmdCodename                   = "vcms-receiver"
+		persistentStorageSaveInterval = 10 // TODO: make configurable.
 	)
 
 	var (
 		version     = false
 		receiverURL = "127.0.0.1:8080" // Don't put e.g. http:// at the start. Add this to docs.
 	)
-
-	cmdSubtitleHTML = fmt.Sprintf("See <a href=\"https://%s\" target=\"_blank\">%s</a> for more info.", vcms.ProjectURL, vcms.ProjectURL)
-	cmdFooterHTML = fmt.Sprintf("<strong>%s</strong> v%s (%s), built with %s, %s/%s. %s", vcms.AppTitle, vcms.AppVersion, vcms.AppDate, runtime.Version(), runtime.GOOS, runtime.GOARCH, cmdSubtitleHTML)
 
 	flag.BoolVar(&debug, "d", debug, "Shows debugging info")
 	flag.BoolVar(&version, "v", false, "Show version info and quit")
@@ -104,7 +101,11 @@ func main() {
 	loadFromPersistentStorage()
 
 	// Save all the nodes out to a file regularly.
-	go saveToPersistentStorageRegularly()
+	// saveToPersistentStorageTicker := time.NewTicker(time.Second * time.Duration(persistentStorageSaveInterval))
+	// defer saveToPersistentStorageTicker.Stop()
+	// saveToPersistentStorageDone := make(chan bool)
+	// go saveToPersistentStorageRegularly(saveToPersistentStorageTicker, saveToPersistentStorageDone)
+	go saveToPersistentStorageRegularly(persistentStorageSaveInterval)
 
 	// Handle files being served out of ./assets/img folder.
 	fileServer := http.FileServer(http.Dir("./assets/img/"))

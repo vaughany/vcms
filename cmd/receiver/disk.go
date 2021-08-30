@@ -13,7 +13,7 @@ func saveToPersistentStorage() {
 	saveJSONToFile()
 }
 
-func saveToPersistentStorageRegularly() {
+func saveToPersistentStorageRegularly(persistentStorageSaveInterval int) {
 	for {
 		time.Sleep(time.Second * time.Duration(persistentStorageSaveInterval))
 		log.Println("Saving nodes to persistent storage (regularly scheduled task).")
