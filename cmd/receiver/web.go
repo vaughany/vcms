@@ -6,7 +6,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"runtime"
 	"sort"
 	"strings"
 	"time"
@@ -24,8 +23,6 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 	var (
 		data          HTMLData
-		subFooterHTML = fmt.Sprintf("See <a href=\"https://%s\" target=\"_blank\">%s</a> for more info.", vcms.ProjectURL, vcms.ProjectURL)
-		footerHTML    = fmt.Sprintf("<strong>%s</strong> v%s (%s), built with %s, %s/%s. %s", vcms.AppTitle, vcms.AppVersion, vcms.AppDate, runtime.Version(), runtime.GOOS, runtime.GOARCH, subFooterHTML)
 		dashboardType = "light"
 	)
 
@@ -49,7 +46,7 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 	// Build the HTML.
 	data.Title = vcms.AppTitle
 	data.Subtitle = fmt.Sprintf("%s Dashboard", strings.Title(dashboardType))
-	data.Footer = template.HTML(footerHTML)
+	data.Footer = template.HTML(makeHTMLFooter())
 	for _, key := range keys {
 		var row rowData
 		if len(nodes[key].Meta.Errors) > 0 {
@@ -58,8 +55,8 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 		row.Hostname = nodes[key].Hostname
 		row.IPAddress = nodes[key].IPAddress
 		row.Username = nodes[key].Username
-		row.FirstSeen = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%s ago)</small></span>", nodes[key].FirstSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].FirstSeen).Round(time.Second))))
-		row.LastSeen = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%s ago)</small></span>", nodes[key].LastSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].LastSeen).Round(time.Second))))
+		row.FirstSeen = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><br><small>(%s ago)</small></span>", nodes[key].FirstSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].FirstSeen).Round(time.Second)).LimitFirstN(3)))
+		row.LastSeen = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><br><small>(%s ago)</small></span>", nodes[key].LastSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].LastSeen).Round(time.Second)).LimitFirstN(3)))
 		row.HostUptime = nodes[key].HostUptime
 		row.OSVersion = nodes[key].OSVersion
 		row.CPU = getCPUHTML(nodes[key])
@@ -87,6 +84,7 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 		row.OSImage = getOSImage(nodes[key])
 
 		data.Rows = append(data.Rows, row)
+		data.RowCount++
 	}
 
 	tmpl := template.Must(template.New("layout.gohtml").Funcs(funcMap).ParseFS(embeddedFiles, "templates/layout.gohtml", fmt.Sprintf("templates/dashboard_%s.gohtml", dashboardType)))
@@ -96,6 +94,50 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("Dashboard (%s) accessed.\n", dashboardType)
+}
+
+func hostsHandler(w http.ResponseWriter, r *http.Request) {
+	var (
+		data HTMLData
+	)
+
+	funcMap := template.FuncMap{
+		"inc": func(i int) int {
+			return i + 1
+		},
+	}
+
+	// Sorting the map into order by hostname.
+	keys := make([]string, 0, len(nodes))
+	for key := range nodes {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	// Build the HTML.
+	data.Title = vcms.AppTitle
+	data.Subtitle = "Hosts"
+	data.Footer = template.HTML(makeHTMLFooter())
+	for _, key := range keys {
+		var row rowData
+		if len(nodes[key].Meta.Errors) > 0 {
+			row.Errors = fmt.Sprintf(" <span style=\"color: red;\" title=\"%s\">ERROR!</span>", strings.Join(nodes[key].Meta.Errors, "\n"))
+		}
+		row.Hostname = nodes[key].Hostname
+		// row.IPAddress = nodes[key].IPAddress
+		// row.OSImage = getOSImage(nodes[key])
+
+		data.Rows = append(data.Rows, row)
+		data.RowCount++
+	}
+
+	tmpl := template.Must(template.New("layout.gohtml").Funcs(funcMap).ParseFS(embeddedFiles, "templates/layout.gohtml", "templates/hosts.gohtml"))
+	err := tmpl.Execute(w, data)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	log.Println("Hosts accessed.")
 }
 
 func hostHandler(w http.ResponseWriter, r *http.Request) {

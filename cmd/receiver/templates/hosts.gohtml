@@ -1,0 +1,32 @@
+{{ define "content" }}
+  <div class="container">
+
+    <h3 class="is-size-3">Hosts ({{ .RowCount }})</h3>
+
+    {{ if .Rows }}
+    <table class="table is-striped is-hoverable is-fullwidth">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Hostname</th>
+          <th>Manage</th>
+        </tr>
+      </thead>
+      <tbody>
+{{ range $index, $element := .Rows }}
+        <tr>
+          <th>{{ inc $index }}</th>
+          <td>
+            <a href="/host/{{ .Hostname }}">{{ .Hostname }}{{ if .Errors }}{{ .Errors }}{{ end }}</a></td>
+          <td><a href="/node/remove/?node={{ .Hostname }}" onclick="return confirm('Are you sure you want to remove this node?')">remove</a></td>
+        </tr>
+{{ end }}
+      </tbody>
+    </table>
+
+    {{ else }}
+      <p>Nothing yet, sorry.</p>
+    {{ end }}
+
+  </div>
+{{ end }}

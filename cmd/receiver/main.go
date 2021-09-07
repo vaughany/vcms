@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 	vcms "vcms/internal"
@@ -41,6 +42,7 @@ type HTMLData struct {
 	Subtitle string
 	Footer   template.HTML
 	Rows     []rowData
+	RowCount int
 }
 
 type rowData struct {
@@ -117,6 +119,7 @@ func main() {
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/dashboard", dashboardHandler)
 	http.HandleFunc("/dashboard/full", dashboardHandler)
+	http.HandleFunc("/hosts", hostsHandler)
 	http.HandleFunc("/host/", hostHandler) // Note the trailing '/'.
 	http.HandleFunc("/api/announce", apiAnnounceHandler)
 	http.HandleFunc("/api/ping", apiPingHandler)
@@ -162,4 +165,9 @@ func shutdownHandler() {
 		log.Println("Exiting.")
 		os.Exit(0)
 	}()
+}
+
+func makeHTMLFooter() string {
+	return fmt.Sprintf("<strong>%s</strong> v%s (%s), built with %s, %s/%s. See <a href=\"https://%s\" target=\"_blank\">%s</a> for more info.",
+		vcms.AppTitle, vcms.AppVersion, vcms.AppDate, runtime.Version(), runtime.GOOS, runtime.GOARCH, vcms.ProjectURL, vcms.ProjectURL)
 }
