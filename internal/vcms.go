@@ -12,8 +12,8 @@ AppXxx stores strings common to both the Collector and Receiver.
 ProjectURL is the URL of the project on GitHub.
 */
 const (
-	AppDate    string = "2021-08-08"
-	AppVersion string = "0.0.7"
+	AppDate    string = "2021-09-07"
+	AppVersion string = "0.0.8"
 	AppTitle   string = "Vaughany's Computer Monitoring System"
 	ProjectURL string = "github.com/vaughany/vcms"
 	AppDesc    string = "Description of the whole system goes here."
@@ -40,18 +40,20 @@ type SystemData struct {
 	// UpdateRequired bool     `json:"update_required"`
 }
 
+// Meta holds meta-information about the Collector app itself.
 type Meta struct {
 	AppVersion string   `json:"app_version"`
 	AppUptime  string   `json:"app_uptime"`
 	Errors     []string `json:"errors"`
 }
 
+// CPU struct holds details about the CPU.
 type CPU struct {
 	Count int    `json:"count"`
 	Speed string `json:"speed"`
 }
 
-// Total 'n' free...
+// TNF struct stores "total 'n' free" data.
 type TNF struct {
 	Total int `json:"total"`
 	Free  int `json:"free"`

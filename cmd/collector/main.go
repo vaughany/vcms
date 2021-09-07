@@ -337,9 +337,8 @@ func getLastSuccessfulSend(t time.Time) string {
 	msg := "Last successful data send:"
 	if t.IsZero() {
 		return fmt.Sprintf("%s Never.\n", msg)
-	} else {
-		return fmt.Sprintf("%s %s (%s ago)\n", msg, t.Format(time.RFC1123Z), time.Since(t).Round(time.Second))
 	}
+	return fmt.Sprintf("%s %s (%s ago)\n", msg, t.Format(time.RFC1123Z), time.Since(t).Round(time.Second))
 }
 
 func getAppUptime(startTime time.Time) string {

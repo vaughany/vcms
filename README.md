@@ -9,7 +9,7 @@
 
 > **tl;dr:**  VCMS is a work-in-progress cross-platform zero-config computer health monitoring tool (for many computers to report their status to a central point) and is a side-project I am working on to learn [Go](https://golang.org/).  Be kind!
 
-I've used [Munin](https://munin-monitoring.org/) for years and [M/Monit](https://mmonit.com/) a lot also.  Both are excellet montoring solutions.  I wanted to try my hand at something similar, as a learning exercise.  *This project doesn't (yet) do anything that Munin or M/Monit don't already do,* but the upside is that it's really, really simple.
+I've used [Munin](https://munin-monitoring.org/) for years and [M/Monit](https://mmonit.com/) a lot also.  Both are excellet montoring solutions.  I wanted to try my hand at something similar, as a learning exercise.  *This project doesn't (yet) do anything that Munin or M/Monit don't already do,* but the upside is that it's really, really simple.  I also recently discovered Go project and enterprise-level monitoring solution [Sensu](https://sensu.io/): hopefully one day this project will be a tenth as good as that! :)
 
 VCMS is two programs: one (called Collector) sits on a computer and monitors it's state, periodically sending the information to the other (called Receiver) which makes a nice live web page out of it.  You can have as many collectors on as many computers as you like.
 
@@ -51,7 +51,7 @@ I aim to test both Receiver and Collector programs on as many OSes and architect
   * 8 / Jessie
   * 9 / Stretch
   * 10 / Buster
-  * ~~11 / Bullseye~~
+  * 11 / Bullseye
 * Ubuntu (recent LTS versions and supported non-LTS versions since the last LTS version):
   * 16.04 LTS / Xenial Xerus
   * 18.04 LTS / Bionic Beaver
@@ -66,6 +66,9 @@ I aim to test both Receiver and Collector programs on as many OSes and architect
 * Red Hat Enterprise Linux:
   * 7 / Maipo
   * 8 / Ootpa
+* Mint
+  * 20
+  * ~~19~~
 * CentOS:
   * ~~Linux 7~~
   * Linux 8
@@ -75,6 +78,10 @@ I aim to test both Receiver and Collector programs on as many OSes and architect
   * 33 (Cloud Edition)
 * Elementary
   * 6 / Odin
+* ~~Gentoo~~
+* ~~Mandriva~~
+* ~~Turbolinux~~
+* ~~Xandros~~
 * Manjaro
 * Oracle:
   * 7
@@ -85,8 +92,12 @@ I aim to test both Receiver and Collector programs on as many OSes and architect
 * Solaris:
   * 11
 * BSD:
-  * ~~FreeBSD~~
-  * ~~OpenBSD~~
+  * FreeBSD
+    * ~~14~~
+    * 13
+    * 12
+  * OpenBSD
+    * 6.9
 * ~~Plan 9~~
 * ~~IBM OS / 2~~
 * ~~macOS~~
@@ -259,7 +270,7 @@ If you have Go installed, clone the repo and build it yourself.
 
 1. The Collector **needs** to be able to connect to the Receiver on the chosen URL, or the Receiver will never receive any data.  You might not be able to communicate across VLANs, for example.
 
-2. Data the Receiver receives is stored only in memory at this time.  If you quit the Receiver, everything is lost. 
+2. ~~Data the Receiver receives is stored only in memory at this time.  If you quit the Receiver, everything is lost.~~ As of version 0.0.4, data is persisted to disk regularly and when the program quits, and is re-loaded on startup.  
 
 3. We currently only use HTTP, which means your data is not encrypted in transit.  For my intended use, this is not a huge concern, but it might be for you.  Addressing this is on the to-do list.
 
@@ -286,7 +297,6 @@ There's a lot I want to do:
   * HTML (web page saved locally, regularly)
   * XML, CSV etc.
 * Web app:
-  * Page listing just the hosts
   * Page listing just the distributions
   * Page listing just one host
 * Consider using github.com/shirou/gopsutil for OS details.
@@ -295,10 +305,11 @@ There's a lot I want to do:
 
 Completed to-do's:
 
+* Data is persisted to disk (as JSON) regularly and when the program quits, and reloaded on startup (v0.0.4).
 * Added operating system icon, where one can be derived from the OS's name (v0.0.4).
 * Ability to remove a node from the Receiver (mostly this was for testing, so I didn't have to quit and restart it) (v0.0.5).
-* Persist to disk (as JSON) (v0.0.6).
 * Export as JSON (v0.0.7).
+* Page listing just the hosts (v0.0.8).
 
 ---
 
@@ -311,6 +322,7 @@ Completed to-do's:
 * **2021-08-06**, v0.0.5.  Added ability to remove a node's data from the Receiver.
 * **2021-08-07**, v0.0.6.  Added timestamp to the disk-persisted data; added macOS to build file.
 * **2021-08-08**, v0.0.7.  Added ability to export all data as JSON.
+* **2021-09-07**, v0.0.8.  Lots of changes based on comments from the nice people at the Gophers Slack, including: removing init(), removing globals (some: work in progress), cleaning up the readme, adding OS logos, using GoReleaser and more linters, basic tests and benchmarks (also work in progress), new lighter dashboard and hosts web pages, and tidied up the struct used to marshal/unmarshal data. 
 
 ---
 

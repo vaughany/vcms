@@ -10,6 +10,14 @@ echo -e "\e[1mBuilding Solaris...'\e[0m"
 env GOOS=solaris GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o bin/collector-solaris ./cmd/collector/
 env GOOS=solaris GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o bin/receiver-solaris ./cmd/receiver/
 
+echo -e "\e[1mBuilding FreeBSD...'\e[0m"
+env GOOS=freebsd GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o bin/collector-freebsd ./cmd/collector/
+env GOOS=freebsd GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o bin/receiver-freebsd ./cmd/receiver/
+
+echo -e "\e[1mBuilding OpenBSD...'\e[0m"
+env GOOS=openbsd GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o bin/collector-openbsd ./cmd/collector/
+env GOOS=openbsd GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o bin/receiver-openbsd ./cmd/receiver/
+
 echo -e "\e[1mBuilding macOS...'\e[0m"
 env GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o bin/collector-macos ./cmd/collector/
 env GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o bin/receiver-macos ./cmd/receiver/
