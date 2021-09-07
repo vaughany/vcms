@@ -57,7 +57,10 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 		row.Username = nodes[key].Username
 		row.FirstSeen = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><br><small>(%s ago)</small></span>", nodes[key].FirstSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].FirstSeen).Round(time.Second)).LimitFirstN(3)))
 		row.LastSeen = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><br><small>(%s ago)</small></span>", nodes[key].LastSeen.Format(conciseDateTimeFormat), durafmt.Parse(time.Since(nodes[key].LastSeen).Round(time.Second)).LimitFirstN(3)))
-		row.HostUptime = nodes[key].HostUptime
+
+		hostUptime, _ := durafmt.ParseString(nodes[key].HostUptime)
+		row.HostUptime = hostUptime.LimitFirstN(2).String()
+
 		row.OSVersion = nodes[key].OSVersion
 		row.CPU = getCPUHTML(nodes[key])
 		if nodes[key].RebootRequired {
@@ -72,14 +75,14 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		row.LoadAvgs = strings.Join(loadAvgsString, " ")
 
-		row.MemoryTotal = bytefmt.ByteSize(uint64(nodes[key].MemoryTotal * bytefmt.KILOBYTE))
-		row.MemoryFree = bytefmt.ByteSize(uint64(nodes[key].MemoryFree * bytefmt.KILOBYTE))
-		row.SwapTotal = bytefmt.ByteSize(uint64(nodes[key].SwapTotal * bytefmt.KILOBYTE))
-		row.SwapFree = bytefmt.ByteSize(uint64(nodes[key].SwapFree * bytefmt.KILOBYTE))
+		row.MemoryTotal = bytefmt.ByteSize(uint64(nodes[key].Memory.Total * bytefmt.KILOBYTE))
+		row.MemoryFree = bytefmt.ByteSize(uint64(nodes[key].Memory.Free * bytefmt.KILOBYTE))
+		row.SwapTotal = bytefmt.ByteSize(uint64(nodes[key].Swap.Total * bytefmt.KILOBYTE))
+		row.SwapFree = bytefmt.ByteSize(uint64(nodes[key].Swap.Free * bytefmt.KILOBYTE))
 
-		row.DiskTotal = bytefmt.ByteSize(uint64(nodes[key].DiskTotal * bytefmt.KILOBYTE))
-		percentage := float64(nodes[key].DiskFree) / float64(nodes[key].DiskTotal) * 100
-		row.DiskFree = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%.1f%%)</small></span>", bytefmt.ByteSize(uint64(nodes[key].DiskFree*bytefmt.KILOBYTE)), percentage))
+		row.DiskTotal = bytefmt.ByteSize(uint64(nodes[key].Disk.Total * bytefmt.KILOBYTE))
+		percentage := float64(nodes[key].Disk.Free) / float64(nodes[key].Disk.Total) * 100
+		row.DiskFree = template.HTML(fmt.Sprintf("%s <span class=\"has-text-grey-light\"><small>(%.1f%%)</small></span>", bytefmt.ByteSize(uint64(nodes[key].Disk.Free*bytefmt.KILOBYTE)), percentage))
 
 		row.OSImage = getOSImage(nodes[key])
 
@@ -166,11 +169,11 @@ func hostHandler(w http.ResponseWriter, r *http.Request) {
 // }
 
 func getCPUHTML(node *vcms.SystemData) string {
-	if node.CPUCount == 0 {
+	if node.CPU.Count == 0 {
 		return "-"
 	}
 
-	return fmt.Sprintf("%d, %s", node.CPUCount, node.CPUSpeed)
+	return fmt.Sprintf("%d, %s", node.CPU.Count, node.CPU.Speed)
 }
 
 func getOSImage(node *vcms.SystemData) string {

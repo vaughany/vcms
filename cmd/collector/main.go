@@ -71,7 +71,7 @@ func sendAnnounce(debug bool, testing bool, receiverURL string) {
 		data.IPAddress = getIPAddress()
 		data.Username = getUsername()
 		data.OSVersion = getOSVersion()
-		data.CPUCount, data.CPUSpeed = getCPUDetails()
+		data.CPU.Count, data.CPU.Speed = getCPUDetails()
 
 		memoryDetails := getMemoryDetails()
 		diskDetails := getDiskDetails()
@@ -79,12 +79,12 @@ func sendAnnounce(debug bool, testing bool, receiverURL string) {
 		// Data that will change.
 		data.HostUptime = getHostUptime()
 		data.RebootRequired = getRebootRequired()
-		data.MemoryTotal = memoryDetails[0]
-		data.MemoryFree = memoryDetails[1]
-		data.SwapTotal = memoryDetails[2]
-		data.SwapFree = memoryDetails[3]
-		data.DiskTotal = diskDetails[0]
-		data.DiskFree = diskDetails[1]
+		data.Memory.Total = memoryDetails[0]
+		data.Memory.Free = memoryDetails[1]
+		data.Swap.Total = memoryDetails[2]
+		data.Swap.Free = memoryDetails[3]
+		data.Disk.Total = diskDetails[0]
+		data.Disk.Free = diskDetails[1]
 		data.LoadAvgs = getLoadAvgs()
 		data.Meta.AppVersion = vcms.AppVersion
 		data.Meta.AppUptime = getAppUptime(startTime)

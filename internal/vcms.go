@@ -23,11 +23,7 @@ const (
 SystemData represents the data we're marshalling to JSON in the Collector, and from JSON in the Receiver.
 */
 type SystemData struct {
-	Meta struct {
-		AppVersion string   `json:"app_version"`
-		AppUptime  string   `json:"app_uptime"`
-		Errors     []string `json:"errors"`
-	} `json:"meta"`
+	Meta           Meta       `json:"meta"`
 	Hostname       string     `json:"hostname"`
 	IPAddress      string     `json:"ip_address"`
 	Username       string     `json:"username"`
@@ -36,16 +32,29 @@ type SystemData struct {
 	HostUptime     string     `json:"host_uptime"`
 	OSVersion      string     `json:"os_version"`
 	RebootRequired bool       `json:"reboot_required"`
-	MemoryTotal    int        `json:"memory_total"`
-	MemoryFree     int        `json:"memory_free"`
-	SwapTotal      int        `json:"swap_total"`
-	SwapFree       int        `json:"swap_free"`
-	DiskTotal      int        `json:"disk_total"`
-	DiskFree       int        `json:"disk_free"`
+	Memory         TNF        `json:"memory"`
+	Swap           TNF        `json:"swap"`
+	Disk           TNF        `json:"disk"`
 	LoadAvgs       [3]float64 `json:"load_avgs"`
-	CPUCount       int        `json:"cpu_count"`
-	CPUSpeed       string     `json:"cpu_speed"`
+	CPU            CPU        `json:"cpu"`
 	// UpdateRequired bool     `json:"update_required"`
+}
+
+type Meta struct {
+	AppVersion string   `json:"app_version"`
+	AppUptime  string   `json:"app_uptime"`
+	Errors     []string `json:"errors"`
+}
+
+type CPU struct {
+	Count int    `json:"count"`
+	Speed string `json:"speed"`
+}
+
+// Total 'n' free...
+type TNF struct {
+	Total int `json:"total"`
+	Free  int `json:"free"`
 }
 
 /*
