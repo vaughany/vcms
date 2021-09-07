@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -25,12 +26,17 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 		data          HTMLData
 		subFooterHTML = fmt.Sprintf("See <a href=\"https://%s\" target=\"_blank\">%s</a> for more info.", vcms.ProjectURL, vcms.ProjectURL)
 		footerHTML    = fmt.Sprintf("<strong>%s</strong> v%s (%s), built with %s, %s/%s. %s", vcms.AppTitle, vcms.AppVersion, vcms.AppDate, runtime.Version(), runtime.GOOS, runtime.GOARCH, subFooterHTML)
+		dashboardType = "light"
 	)
 
 	funcMap := template.FuncMap{
 		"inc": func(i int) int {
 			return i + 1
 		},
+	}
+
+	if strings.Contains(r.URL.Path, "/full") {
+		dashboardType = "full"
 	}
 
 	// Sorting the map into order by hostname.
@@ -42,7 +48,7 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Build the HTML.
 	data.Title = vcms.AppTitle
-	// data.Subtitle = "Something Something Darkside"
+	data.Subtitle = fmt.Sprintf("%s Dashboard", strings.Title(dashboardType))
 	data.Footer = template.HTML(footerHTML)
 	for _, key := range keys {
 		var row rowData
@@ -83,13 +89,30 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
 		data.Rows = append(data.Rows, row)
 	}
 
-	tmpl := template.Must(template.New("layout.gohtml").Funcs(funcMap).ParseFS(embeddedFiles, "templates/layout.gohtml", "templates/dashboard.gohtml"))
+	tmpl := template.Must(template.New("layout.gohtml").Funcs(funcMap).ParseFS(embeddedFiles, "templates/layout.gohtml", fmt.Sprintf("templates/dashboard_%s.gohtml", dashboardType)))
 	err := tmpl.Execute(w, data)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	log.Println("Dashboard accessed.")
+	log.Printf("Dashboard (%s) accessed.\n", dashboardType)
+}
+
+func hostHandler(w http.ResponseWriter, r *http.Request) {
+	node := r.URL.Path[6:]
+	if node == "" {
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	}
+
+	jsonBytes, err := json.Marshal(nodes[node])
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "%s", jsonBytes)
 }
 
 // func logoHandler(w http.ResponseWriter, r *http.Request) {
@@ -157,13 +180,13 @@ func getOSImage(node *vcms.SystemData) string {
 func saveToPersistentStorageHandler(w http.ResponseWriter, r *http.Request) {
 	saveToPersistentStorage()
 
-	http.Redirect(w, r, "/dashboard", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }
 
 func loadFromPersistentStorageHandler(w http.ResponseWriter, r *http.Request) {
 	loadFromPersistentStorage()
 
-	http.Redirect(w, r, "/dashboard", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }
 
 func nodeRemoveHandler(w http.ResponseWriter, r *http.Request) {
@@ -179,5 +202,5 @@ func nodeRemoveHandler(w http.ResponseWriter, r *http.Request) {
 
 	delete(nodes, node)
 
-	http.Redirect(w, r, "/dashboard", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }

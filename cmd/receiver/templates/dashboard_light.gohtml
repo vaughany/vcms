@@ -1,0 +1,49 @@
+{{ define "content" }}
+  <div class="container-flex">
+
+    <h3 class="is-size-3">Nodes</h3>
+
+    {{ if .Rows }}
+    <table class="table is-striped is-hoverable is-fullwidth">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th><abbr title="Hover for OS details">OS / Img</abbr></th>
+          <!-- <th>User@Hostname</th> -->
+          <th>Hostname</th>
+          <th>IP Address</th>
+          <th>Username</th>
+          <th>Last Seen</th>
+          <th>Uptime</th>
+          <th>Manage</th>
+        </tr>
+      </thead>
+      <tbody>
+{{ range $index, $element := .Rows }}
+        <tr>
+          <th>{{ inc $index }}</th>
+          <th>
+            <figure class="image is-48x48">
+              <img src="/img/{{ .OSImage }}.png" title="{{ .OSVersion }}">
+            </figure>
+          </th>
+          <!-- <td>{{ if .Username }}{{ .Username }}@{{ end }}{{ .Hostname }}</td> -->
+          <td>
+            <a href="/host/{{ .Hostname }}">{{ .Hostname }}{{ if .Errors }}{{ .Errors }}{{ end }}</a>
+          </td>
+          <td>{{ .IPAddress }}</td>
+          <td>{{ .Username }}</td>
+          <td>{{ .LastSeen }}</td>
+          <td>{{ .HostUptime }}</td>
+          <td><a href="/node/remove/?node={{ .Hostname }}" onclick="return confirm('Are you sure you want to remove this node?')">remove</a></td>
+        </tr>
+{{ end }}
+      </tbody>
+    </table>
+
+    {{ else }}
+      <p>Nothing yet, sorry.</p>
+    {{ end }}
+
+  </div>
+{{ end }}

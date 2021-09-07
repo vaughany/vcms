@@ -116,6 +116,8 @@ func main() {
 
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/dashboard", dashboardHandler)
+	http.HandleFunc("/dashboard/full", dashboardHandler)
+	http.HandleFunc("/host/", hostHandler) // Note the trailing '/'.
 	http.HandleFunc("/api/announce", apiAnnounceHandler)
 	http.HandleFunc("/api/ping", apiPingHandler)
 
