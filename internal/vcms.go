@@ -3,6 +3,8 @@ package vcms
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"runtime"
 	"time"
 )
@@ -12,11 +14,12 @@ AppXxx stores strings common to both the Collector and Receiver.
 ProjectURL is the URL of the project on GitHub.
 */
 const (
-	AppDate    string = "2021-09-07"
-	AppVersion string = "0.0.8"
+	AppDate    string = "2021-09-09"
+	AppVersion string = "0.0.9"
 	AppTitle   string = "Vaughany's Computer Monitoring System"
 	ProjectURL string = "github.com/vaughany/vcms"
 	AppDesc    string = "Description of the whole system goes here."
+	LogFolder  string = "logs"
 )
 
 /*
@@ -88,4 +91,44 @@ Version formats and prints to the log the version details of the application, th
 func Version(appName string) string {
 	// return fmt.Sprintf("%s v%s (%s), %s.\n%s\n", appName, AppVersion, AppDate, runtime.Version(), AppDesc)
 	return fmt.Sprintf("%s v%s (%s), %s.", appName, AppVersion, AppDate, runtime.Version())
+}
+
+/*
+CheckLogFolder checks for the existence of the log folder.
+*/
+func CheckLogFolder(logFolder string) bool {
+	if stat, err := os.Stat(logFolder); err != nil || !stat.IsDir() {
+		log.Printf("Log folder '%s' doesn't exist.\n", logFolder)
+		if !CreateLogFolder(logFolder) {
+			log.Printf("Error: Log folder '%s' could not be created.\n", logFolder)
+			return false
+		}
+		log.Printf("Log folder '%s' created.\n", logFolder)
+		return true
+	}
+	log.Printf("Log folder '%s' exists.\n", logFolder)
+	return true
+}
+
+/*
+CreateLogFolder creates a log folder.
+*/
+func CreateLogFolder(logFolder string) bool {
+	err := os.Mkdir(logFolder, 0755)
+	if err != nil {
+		log.Print(err)
+		return false
+	}
+	return true
+}
+
+/*
+CreateLogName creates and returns a name for the log file, based on the application's start date.
+*/
+func CreateLogName(logFolder string, cmdName string) string {
+	// time := time.Now().Format("2006-01-02_15-04-05")
+	// time := time.Now().Format("2006-01-02_15-04")
+	time := time.Now().Format("2006-01-02")
+
+	return fmt.Sprintf("%s/%s_%s.log", logFolder, cmdName, time)
 }

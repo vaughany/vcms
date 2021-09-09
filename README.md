@@ -322,7 +322,8 @@ Completed to-do's:
 * **2021-08-06**, v0.0.5.  Added ability to remove a node's data from the Receiver.
 * **2021-08-07**, v0.0.6.  Added timestamp to the disk-persisted data; added macOS to build file.
 * **2021-08-08**, v0.0.7.  Added ability to export all data as JSON.
-* **2021-09-07**, v0.0.8.  Lots of changes based on comments from the nice people at the Gophers Slack, including: removing init(), removing globals (some: work in progress), cleaning up the readme, adding OS logos, using GoReleaser and more linters, basic tests and benchmarks (also work in progress), new lighter dashboard and hosts web pages, and tidied up the struct used to marshal/unmarshal data. 
+* **2021-09-07**, v0.0.8.  Lots of changes based on comments from the nice people at the Gophers Slack, including: removing init(), removing globals (some: work in progress), cleaning up the readme, adding OS logos, using GoReleaser and more linters, basic tests and benchmarks (also work in progress), new lighter dashboard and hosts web pages, and tidied up the struct used to marshal/unmarshal data.
+* **2021-09-09**, v0.0.9.  Added logging to a file. Creates folder in cwd, then creates a named and dated file, logs to it and stdout.
 
 ---
 

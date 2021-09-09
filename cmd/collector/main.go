@@ -13,11 +13,13 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"os/signal"
 	"os/user"
 	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 	vcms "vcms/internal"
 )
@@ -34,6 +36,7 @@ func main() {
 		debug       = false
 		testing     = false
 		receiverURL = "http://127.0.0.1:8080"
+		logName     = vcms.CreateLogName(vcms.LogFolder, cmdCodename)
 	)
 
 	flag.BoolVar(&debug, "d", debug, "Shows debugging info")
@@ -46,6 +49,20 @@ func main() {
 		fmt.Println(vcms.Version(cmdName))
 		os.Exit(0)
 	}
+
+	// Opens a logfile for writing and also outputs to stdout.
+	vcms.CheckLogFolder(vcms.LogFolder)
+	lf, err := os.OpenFile(logName, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0755)
+	if err != nil {
+		log.Print(err)
+		log.Printf("Error: Couldn't open '%s' for writing, so logging to stdout only.\n", logName)
+	} else {
+		defer lf.Close()
+		log.SetOutput(io.MultiWriter(os.Stdout, lf))
+		log.Printf("Startup: Logging to stdout and '%s'.\n", logName)
+	}
+
+	shutdownHandler()
 
 	log.Println(vcms.Version(cmdName))
 	log.Printf("%s \n", cmdDesc)
@@ -364,4 +381,22 @@ func getCPUDetails() (int, string) {
 	speed := fmt.Sprint(cpuDetailsSlice[len(cpuDetailsSlice)-1])
 
 	return count, speed
+}
+
+// https://stackoverflow.com/a/12571099/254146
+func shutdownHandler() {
+	channel := make(chan os.Signal)
+	signal.Notify(channel, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-channel
+		log.Println("Close signal detected: shutting down.")
+
+		// TODO: e.g. notify Slack, send an email etc.
+
+		log.Println("Shutdown: bye bye.")
+		log.Println()
+		log.Println()
+		log.Println()
+		os.Exit(0)
+	}()
 }

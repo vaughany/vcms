@@ -4,3 +4,4 @@ nodes.json
 dist/
 .github_token
 codecov.yml
+cmd/*/logs/*
