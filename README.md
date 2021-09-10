@@ -269,6 +269,16 @@ Pings are logged.
 >
 > `curl http://127.0.0.1:8080/api/ping`
 
+In v0.0.9 I added logging to a file. Both commands will create and use a folder called `logs` in the current working directory, but each command's log file is named differently and datestamped with the date the command was run, e.g.:
+
+```
+$ ls -hl logs/
+-rwxr-xr-x 1 paulvaughan paulvaughan 258K Sep 10 23:12 vcms-collector_2021-09-10.log
+-rwxr-xr-x 1 paulvaughan paulvaughan 167K Sep 10 23:13 vcms-receiver_2021-09-10.log
+```
+
+There's nothing in the commands which culls old logs, or logs over a certain size: they will continue to grow in size and number over time.  This is acceptable to me at this time, but I may come up with a different solution (e.g. configurable log settings) in the future.  For now, just keep an eye on them and delete occasionally.  And don't use debugging (`-d`) unless absolutely required.
+
 ---
 
 ## Building from source
@@ -348,6 +358,7 @@ There's a lot I want to do:
 * Look into using gRPC / protocol buffers. Unsure if they have any advantage over simple JSON.
 * Send a 'pause', 'restart' or 'force send' from the Receiver.
 * Controls on the Receiver web page to increase / decrease the speed of individual Collector or pause it for a bit / a lot.
+* Ability to monitor the Receiver's 'logs' folder, and the individual Collector command's 'logs' folders, warning of too many / too large files, and delete them.
 
 Completed to-do's:
 
@@ -364,7 +375,7 @@ Completed to-do's:
 ## History
 
 * **2021-07-01**, v0.0.1.  Initial release.  Collector registers basic info with the Receiver.
-* **2021-07-xx**, v0.0.2.  Collects more information, but only on Linux.  Change to struct to allow 'meta' data such as app version, errors.  Version check: Receiver will reject data if the Collector is not the same version.
+* **2021-07-12**, v0.0.2.  Collects more information, but only on Linux.  Change to struct to allow 'meta' data such as app version, errors.  Version check: Receiver will reject data if the Collector is not the same version.
 * **2021-08-02**, v0.0.3.  Bug fixes: using host address, not remote address; hung on failed data send.  Ensured changing data is logged on first attempt: it's anti-DRY, but the web page doesn't look like it's broken now.  Added basic Windows version string.  Tested Collector on many versions of Linux, and Windows 10.  Added CPU count and clock speed.  Added more future to-do's to readme.
 * **2021-08-05**, v0.0.4.  Upgraded to Go v1.16.7.  Added operating system images for many systems, to made identification easier (I found out that although they're marketed differently, Lubuntu and Kubuntu identify themselves as Ubuntu, and 'MX' as Debian).  More testing, including Solaris (had to add some 'not yet implemented' checks) requiring new binaries and new build config in the 'build.sh' helper script (only the binaries for Linux are kept in the repo).  Data in the Receiver is persisted to disk at regular intervals and when the program is terminated (additionally created a shutdown handler to achieve this).  Data is then loaded again at startup.
 * **2021-08-06**, v0.0.5.  Added ability to remove a node's data from the Receiver.
