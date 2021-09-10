@@ -18,8 +18,8 @@ AppXxx stores strings common to both the Collector and Receiver.
 ProjectURL is the URL of the project on GitHub.
 */
 const (
-	AppDate    string = "2021-09-09"
-	AppVersion string = "0.0.9"
+	AppDate    string = "2021-09-10"
+	AppVersion string = "0.0.10"
 	AppTitle   string = "Vaughany's Computer Monitoring System"
 	ProjectURL string = "github.com/vaughany/vcms"
 	AppDesc    string = "Description of the whole system goes here."
@@ -52,6 +52,7 @@ type Meta struct {
 	AppVersion string   `json:"app_version"`
 	AppUptime  string   `json:"app_uptime"`
 	Errors     []string `json:"errors"`
+	APIKey     string   `json:"api_key"`
 }
 
 // CPU struct holds details about the CPU.

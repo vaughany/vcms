@@ -176,9 +176,9 @@ I aim to test both Receiver and Collector programs on as many OSes and architect
 
 ## Better Linux installation
 
-By default, the Receiver runs the web page and API on `127.0.0.1` ('localhost') on port `8080`.  These are fair defaults, but won't work outside your computer.
+By default, the Receiver runs the web page and API on `127.0.0.1` ('localhost') on port `8080`.  These are fair defaults, but won't work outside your computer.  Both programs allow you to specify the IP address and port to use with the `-r` flag.  
 
-Both programs allow you to specify the IP address and port to use with the `-r` flag.  
+As of v0.0.10 you can force the use of a pre-shared key, so that data sent without it is rejected.  There's also a helper function to generate one for you.
 
 1. To run Receiver on a different IP address and/or port:
 
@@ -197,11 +197,57 @@ Both programs allow you to specify the IP address and port to use with the `-r` 
    ./collector -r http://192.168.0.100:8081
    ```
 
-> **Note:** Some TCP/IP ports, such as the standard web port 80, are restricted and cannot be used unless you run the program with elevated privileges:
->
->`./receiver -r 192.168.0.100:80 // reserved port: fails.`
->
->`sudo ./receiver -r 192.168.0.100:80 // works.`
+   > **Note:** Some TCP/IP ports, such as the standard web port 80, are restricted and cannot be used unless you run the program with elevated privileges:
+   >
+   >`./receiver -r 192.168.0.100:80 // reserved port: fails.`
+   >
+   >`sudo ./receiver -r 192.168.0.100:80 // works.`
+
+3. To force the use of a pre-shared key for added security:
+
+   If the Receiver specifies a pre-shared (API) key, then any Collector sending data is required to send the same key within the JSON, or the data will be rejected. 
+
+   > **Note:**  The Receiver is not yet using HTTPS so data is not encrypted in transit, nor is the API key encrypted in any way in the JSON.
+
+   Run the Receiver as follows (continuing the example from above):
+
+   ```
+   ./receiver -r 192.168.0.100:8081 --apikey long-string-of-letters-and-numbers
+   ```
+
+   > **Note:** You can't specify **no** API key (e.g. `--apikey`) but you can specify an **empty** API key (e.g. `--apikey ""`), which is treated as no API key. This is silly, don't do it.
+
+   At startup, the helper text shown to run a correcly-configured Collector will show the new command:
+
+   ```
+   To connect a Collector, run: './collector -r http://192.168.0.100:8081 --apikey long-string-of-letters-and-numbers'.
+   ```
+
+   If a Collector has not been similarly configured, you'll get an error message and HTTP status code 403:
+
+   ```
+   Response: 403 Forbidden
+   ERROR: 192.168.0.100:8081: Collector API key '' does not match Receiver API key (not shown). Ignoring data.
+   ```
+
+   ...so configure the Collector as described above.
+
+4. Getting a random pre-shared key:
+
+   Both Receiver and Collector apps can be run with `-k` as the only argument, and this will generate a handful of keys of varying lengths in both hex and base64 formats, then quit.  It's just a convenience helper, nothing more.  Run it multiple times for more random keys.
+
+   ```
+   $ ./collector -k
+   Hex:
+    16 chars: 1869abd649331542 / 1869ABD649331542
+    32 chars: 2c282ff203bb30879a5505493cbc2d13 / 2C282FF203BB30879A5505493CBC2D13
+    48 chars: bb12c3223fa26ed0b04f7767758f48a3c42bfbc07c07d826 / BB12C3223FA26ED0B04F7767758F48A3C42BFBC07C07D826
+   Base64:
+    16 chars: i0L2oZt32HSIKWhC
+    32 chars: Pjb3niW4La7OsTcuJeKI8PPYeinBjhBn
+    48 chars: nBqtfU-gdvZ74XZP3phTv7CE1jezCFjVfkajfYofU7V8B2Bs
+    64 chars: eS5uz5UyV5x31T_aRYEHWHRC3Jj5dtDErPmjN3SqOOI9MVPKUBmiQ4HYazy37Nef
+   ```
 
 ---
 
@@ -287,7 +333,6 @@ There's a lot I want to do:
 * Choice of HTTP or HTTPS.
 * Create a proper web-app with secure login.
 * Create groups to group Collectors by, e.g. 'dev', 'production' etc.
-* Authentication of Collectors by e.g. pre-shared key.
 * More active monitoring, with alerts should something go awry.
 * Web-based, Email and Slack notifications of alerts.
 * Monitor software deployed by the Ruby gem Capistrano.
@@ -302,6 +347,7 @@ There's a lot I want to do:
 * Consider using github.com/shirou/gopsutil for OS details.
 * Look into using gRPC / protocol buffers. Unsure if they have any advantage over simple JSON.
 * Send a 'pause', 'restart' or 'force send' from the Receiver.
+* Controls on the Receiver web page to increase / decrease the speed of individual Collector or pause it for a bit / a lot.
 
 Completed to-do's:
 
@@ -310,6 +356,8 @@ Completed to-do's:
 * Ability to remove a node from the Receiver (mostly this was for testing, so I didn't have to quit and restart it) (v0.0.5).
 * Export as JSON (v0.0.7).
 * Page listing just the hosts (v0.0.8).
+* Logging to a file as well as stdout (v0.0.9).
+* Authentication of Collectors by pre-shared key (v0.0.10).
 
 ---
 
@@ -324,6 +372,7 @@ Completed to-do's:
 * **2021-08-08**, v0.0.7.  Added ability to export all data as JSON.
 * **2021-09-07**, v0.0.8.  Lots of changes based on comments from the nice people at the Gophers Slack, including: removing init(), removing globals (some: work in progress), cleaning up the readme, adding OS logos, using GoReleaser and more linters, basic tests and benchmarks (also work in progress), new lighter dashboard and hosts web pages, and tidied up the struct used to marshal/unmarshal data.
 * **2021-09-09**, v0.0.9.  Added logging to a file. Creates folder in cwd, then creates a named and dated file, logs to it and stdout.
+* **2021-09-10**, v0.0.10.  Added a basic form of authentication by the use of pre-shared keys, using the `--apikey` flag. Collectors sending data with a non-matching or empty key will have their data rejected.  Generate random keys with the `-k` helper flag.
 
 ---
 

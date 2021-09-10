@@ -10,13 +10,13 @@ import (
 	vcms "vcms/internal"
 )
 
-func apiAnnounceHandler(w http.ResponseWriter, r *http.Request) {
+func (ch *ContextHandler) apiAnnounceHandler(w http.ResponseWriter, r *http.Request) {
 	jsonBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	if debug {
+	if ch.debug {
 		log.Printf("Received %s from %s", jsonBytes, r.RemoteAddr)
 	} else {
 		log.Printf("Received data from %s", r.RemoteAddr)
@@ -35,6 +35,16 @@ func apiAnnounceHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(error)
 		http.Error(w, error, http.StatusUnprocessableEntity)
 		return
+	}
+
+	// Check for API key, ensure it matches if length is non-zero.
+	if len(ch.APIKey) > 0 {
+		if data.Meta.APIKey != ch.APIKey {
+			error := fmt.Sprintf("ERROR: %s: Collector API key '%s' does not match Receiver API key (not shown). Ignoring data.", r.Host, data.Meta.APIKey)
+			log.Println(error)
+			http.Error(w, error, http.StatusForbidden)
+			return
+		}
 	}
 
 	// It's all good.

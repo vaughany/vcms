@@ -25,7 +25,6 @@ var embeddedFiles embed.FS
 // Something like this, to ditch global state?
 //   https://stackoverflow.com/a/46517000/254146
 var (
-	debug = false
 	nodes = make(map[string]*vcms.SystemData)
 )
 
@@ -66,6 +65,11 @@ type rowData struct {
 	DiskFree       template.HTML
 }
 
+type ContextHandler struct {
+	debug  bool
+	APIKey string
+}
+
 func main() {
 	const (
 		cmdName                       = "VCMS - Receiver"
@@ -75,16 +79,19 @@ func main() {
 	)
 
 	var (
+		debug       = false
 		version     = false
 		keyGen      = false
 		receiverURL = "127.0.0.1:8080" // Don't put e.g. http:// at the start. Add this to docs.
 		logName     = vcms.CreateLogName(vcms.LogFolder, cmdCodename)
+		APIKey      = ""
 	)
 
-	flag.BoolVar(&debug, "d", debug, "Shows debugging info")
-	flag.BoolVar(&version, "v", false, "Show version info and quit")
+	flag.StringVar(&APIKey, "apikey", APIKey, "API key, if you want the Collector to prove it's legit")
+	flag.BoolVar(&debug, "d", debug, "Shows debugging info, incl all JSON being sent")
 	flag.BoolVar(&keyGen, "k", false, "Quickly generate a few random keys")
 	flag.StringVar(&receiverURL, "r", receiverURL, "URL to run this application's web server on")
+	flag.BoolVar(&version, "v", false, "Show version info and quit")
 	flag.Parse()
 
 	if version {
@@ -116,7 +123,7 @@ func main() {
 	log.Printf("%s \n", vcms.AppDesc)
 
 	if debug {
-		go dumper(nodes)
+		go dumper()
 	}
 
 	// Load the nodes from a file.
@@ -141,7 +148,9 @@ func main() {
 	http.HandleFunc("/dashboard/full", dashboardHandler)
 	http.HandleFunc("/hosts", hostsHandler)
 	http.HandleFunc("/host/", hostHandler) // Note the trailing '/'.
-	http.HandleFunc("/api/announce", apiAnnounceHandler)
+
+	contextHandler := &ContextHandler{debug: debug, APIKey: APIKey}
+	http.HandleFunc("/api/announce", contextHandler.apiAnnounceHandler)
 	http.HandleFunc("/api/ping", apiPingHandler)
 
 	http.HandleFunc("/save", saveToPersistentStorageHandler)
@@ -150,12 +159,16 @@ func main() {
 
 	http.HandleFunc("/export/json", exportJSONHandler)
 
+	APIKeyInfo := ""
+	if len(APIKey) > 0 {
+		APIKeyInfo = fmt.Sprintf(" --apikey %s", APIKey)
+	}
 	log.Printf("Running web server on http://%s.", receiverURL)
-	log.Printf("To connect a Collector, run: './collector -r http://%s'.", receiverURL)
+	log.Printf("To connect a Collector, run: './collector -r http://%s%s'.", receiverURL, APIKeyInfo)
 	log.Fatal(http.ListenAndServe(receiverURL, nil))
 }
 
-func dumper(nodes map[string]*vcms.SystemData) {
+func dumper() {
 	for {
 		log.Println("Dumping nodes:")
 		if len(nodes) > 0 {

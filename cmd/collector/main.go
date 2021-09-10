@@ -3,6 +3,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -24,6 +25,10 @@ import (
 	vcms "vcms/internal"
 )
 
+type (
+	contextKey string
+)
+
 func main() {
 	const (
 		cmdName     string = "VCMS - Collector"
@@ -38,12 +43,14 @@ func main() {
 		testing     = false
 		receiverURL = "http://127.0.0.1:8080"
 		logName     = vcms.CreateLogName(vcms.LogFolder, cmdCodename)
+		APIKey      = ""
 	)
 
-	flag.BoolVar(&debug, "d", debug, "Shows debugging info")
+	flag.StringVar(&APIKey, "apikey", APIKey, "API key, if the Receiver requires one")
+	flag.BoolVar(&debug, "d", debug, "Shows debugging info, incl all JSON being sent")
 	flag.BoolVar(&keyGen, "k", false, "Quickly generate a few random keys")
-	flag.BoolVar(&testing, "t", testing, "Creates a random hostname, username and IP address")
 	flag.StringVar(&receiverURL, "r", receiverURL, "URL of the 'Receiver' application")
+	flag.BoolVar(&testing, "t", testing, "Creates a random hostname, username and IP address")
 	flag.BoolVar(&version, "v", version, "Show version info and quit")
 	flag.Parse()
 
@@ -75,10 +82,15 @@ func main() {
 	log.Printf("%s \n", cmdDesc)
 	log.Printf("%s \n", vcms.AppDesc)
 
-	sendAnnounce(debug, testing, receiverURL)
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, contextKey("debug"), debug)
+	ctx = context.WithValue(ctx, contextKey("testing"), testing)
+	ctx = context.WithValue(ctx, contextKey("APIKey"), APIKey)
+
+	sendAnnounce(ctx, contextKey("debug"), contextKey("testing"), contextKey("APIKey"), receiverURL)
 }
 
-func sendAnnounce(debug bool, testing bool, receiverURL string) {
+func sendAnnounce(ctx context.Context, debug contextKey, testing contextKey, APIKey contextKey, receiverURL string) {
 	var (
 		watchDelay         = 10
 		startTime          = time.Now()
@@ -113,9 +125,10 @@ func sendAnnounce(debug bool, testing bool, receiverURL string) {
 		data.Meta.AppVersion = vcms.AppVersion
 		data.Meta.AppUptime = getAppUptime(startTime)
 		data.Meta.Errors = errors
+		data.Meta.APIKey = fmt.Sprintf("%s", ctx.Value(APIKey))
 
 		// Adjust some of the core data if we're testing.
-		if testing {
+		if ctx.Value(testing) == true {
 			data.Hostname = getRandomHostname()
 			data.IPAddress = getRandomIPAddress()
 			data.Username = getRandomUsername()
@@ -127,7 +140,7 @@ func sendAnnounce(debug bool, testing bool, receiverURL string) {
 		}
 
 		sendURL := receiverURL + "/api/announce"
-		if debug {
+		if ctx.Value(debug) == true {
 			log.Printf("Sending %s to %s", jsonBytes, sendURL)
 		} else {
 			log.Printf("Sending data to %s", sendURL)
