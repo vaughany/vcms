@@ -76,17 +76,24 @@ func main() {
 
 	var (
 		version     = false
+		keyGen      = false
 		receiverURL = "127.0.0.1:8080" // Don't put e.g. http:// at the start. Add this to docs.
 		logName     = vcms.CreateLogName(vcms.LogFolder, cmdCodename)
 	)
 
 	flag.BoolVar(&debug, "d", debug, "Shows debugging info")
 	flag.BoolVar(&version, "v", false, "Show version info and quit")
+	flag.BoolVar(&keyGen, "k", false, "Quickly generate a few random keys")
 	flag.StringVar(&receiverURL, "r", receiverURL, "URL to run this application's web server on")
 	flag.Parse()
 
 	if version {
 		fmt.Println(vcms.Version(cmdName))
+		os.Exit(0)
+	}
+
+	if keyGen {
+		vcms.ShowRandomKeys()
 		os.Exit(0)
 	}
 

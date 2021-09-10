@@ -33,6 +33,7 @@ func main() {
 
 	var (
 		version     = false
+		keyGen      = false
 		debug       = false
 		testing     = false
 		receiverURL = "http://127.0.0.1:8080"
@@ -40,6 +41,7 @@ func main() {
 	)
 
 	flag.BoolVar(&debug, "d", debug, "Shows debugging info")
+	flag.BoolVar(&keyGen, "k", false, "Quickly generate a few random keys")
 	flag.BoolVar(&testing, "t", testing, "Creates a random hostname, username and IP address")
 	flag.StringVar(&receiverURL, "r", receiverURL, "URL of the 'Receiver' application")
 	flag.BoolVar(&version, "v", version, "Show version info and quit")
@@ -47,6 +49,11 @@ func main() {
 
 	if version {
 		fmt.Println(vcms.Version(cmdName))
+		os.Exit(0)
+	}
+
+	if keyGen {
+		vcms.ShowRandomKeys()
 		os.Exit(0)
 	}
 
